@@ -4,6 +4,7 @@ import UserCreation from "../types/UserCreation";
 import { authenticator } from "otplib";
 import { AES, enc } from 'crypto-js'
 import UserLogin from "../types/UserLogin";
+import jwt from 'jsonwebtoken'
 
 
 async function getById(id:string){
@@ -18,9 +19,12 @@ async function login(user:UserLogin){
         const secret = bytes.toString(enc.Utf8)
 
         if(user.token === authenticator.generate(secret)){
+            const sessionToken = jwt.sign({username: user.username}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
+
             return {
                 state: "Done",
-                message: "Logged in!"
+                message: "Logged in!",
+                sessionToken
             }
         }
         return {
