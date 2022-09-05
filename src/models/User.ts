@@ -4,10 +4,10 @@ const schema = new Schema({
         type: String,
         required: true
     },
-    names: String,
-    surname: String,
-    age:Number,
-    key:String
+    secret: {
+        type: String,
+        required: true
+    }
 })
 
 const User = model("User", schema)

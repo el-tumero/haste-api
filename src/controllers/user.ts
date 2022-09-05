@@ -1,6 +1,6 @@
 import User from "../models/User";
 import Joi from "joi"
-import UserInput from "../types/UserInput";
+import UserCreation from "../types/UserCreation";
 import { authenticator } from "otplib";
 import { AES, enc } from 'crypto-js'
 import UserLogin from "../types/UserLogin";
@@ -10,12 +10,11 @@ async function getById(id:string){
     return await User.findById(id, 'username names surname age').exec()
 }
 
-
 async function login(user:UserLogin){
     try {
         await loginSchema.validateAsync(user)
-        const encryptedSecret = await User.findOne({username: user.username}, 'key').exec()
-        const bytes = AES.decrypt(encryptedSecret.key, user.password)
+        const encryptedSecret = await User.findOne({username: user.username}, 'secret').exec()
+        const bytes = AES.decrypt(encryptedSecret.secret, user.password)
         const secret = bytes.toString(enc.Utf8)
 
         if(user.token === authenticator.generate(secret)){
@@ -38,27 +37,22 @@ async function login(user:UserLogin){
     
 }
 
-async function create(user:UserInput){
+async function create(user:UserCreation){
     try{
-        await createSchema.validateAsync(user)
-        const secret = authenticator.generateSecret()
 
-        const encryptedSecret = AES.encrypt(secret, user.password).toString()
+        await createSchema.validateAsync(user)
 
         const {_id} = await User.create({
             username: user.username,
-            names: user.names,
-            surname: user.surname,
-            age: user.age,
-            key: encryptedSecret
+            secret: user.secret
         })
 
         return {
             state: "Done",
             message: "Succesfully created a user!",
-            id: _id,
-            secret,
+            id: _id
         }
+
     }catch(err){
         return {
             state: "Error",
@@ -67,17 +61,14 @@ async function create(user:UserInput){
     }
 }
 
-const createSchema = Joi.object<UserInput, true, UserInput>({
+const createSchema = Joi.object<UserCreation, true, UserCreation>({
     username: Joi.string().alphanum().min(3).max(20).required(),
-    names: Joi.string().alphanum().min(2).max(30),
-    surname: Joi.string().alphanum().min(2).max(20),
-    age: Joi.number().integer().greater(3).less(120),
-    password: Joi.string().alphanum().min(8).max(250).required()
+    secret: Joi.string().required()
 })
 
 const loginSchema = Joi.object<UserLogin, true, UserLogin>({
     username: Joi.string().alphanum().min(3).max(20).required(),
-    password: Joi.string().alphanum().min(8).required(),
+    password: Joi.string().min(8).required(),
     token: Joi.string().alphanum().length(6).required()
 })
 
