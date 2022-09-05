@@ -5,10 +5,10 @@ import cors from "cors"
 import 'dotenv/config'
 import cookieParser from "cookie-parser";
 
-const PORT = 3000
+const PORT = process.env.PORT
 
-// connecting to local mongodb -> haste db
-mongoose.connect('mongodb://localhost/haste')
+// connecting to mongodb -> haste db
+mongoose.connect(process.env.MONGO_URI)
 
 const app = express()
 
