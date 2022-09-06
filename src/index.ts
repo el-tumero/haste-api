@@ -9,6 +9,8 @@ const PORT = process.env.PORT
 
 // connecting to mongodb -> haste db
 mongoose.connect(process.env.MONGO_URI)
+.then(() => console.log("Connected to DB!"))
+.catch(err => console.log(err))
 
 const app = express()
 
@@ -23,6 +25,12 @@ app.use("/user", routes.user)
 
 app.get("/", (req, res) => {
     res.send("haste-api")
+})
+
+app.get("/test-cookies", (req, res) => {
+    res.json({
+        cookies: req.cookies
+    })
 })
 
 app.listen(3000, () => {

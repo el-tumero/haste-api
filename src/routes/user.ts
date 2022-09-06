@@ -10,10 +10,12 @@ user.get("/:id", async (req, res) => {
 
 user.post("/login", async(req, res) => {
     const data = await controllers.user.login(req.body)
-    console.log(data.sessionToken)
     res.cookie("sessionToken", data.sessionToken, {
-        httpOnly: true 
-    }) // secure only for https
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+    })
     res.json({state: data.state, message: data.message})
 })
 

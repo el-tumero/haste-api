@@ -5,9 +5,9 @@
   "author": "el-tumero",
   "license": "MIT",
   "scripts": {
-    "start": "node ./dist/index.js",
+    "start": "NODE_ENV=production node ./dist/index.js",
     "build": "tsc",
-    "dev": "nodemon ./src/index.ts"
+    "dev": "NODE_ENV=development nodemon ./src/index.ts"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^8.5.9",
