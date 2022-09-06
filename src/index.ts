@@ -21,6 +21,10 @@ app.use(cookieParser())
 
 app.use("/user", routes.user)
 
+app.get("/", (req, res) => {
+    res.send("haste-api")
+})
+
 app.listen(3000, () => {
     console.log("Listening at http://localhost:"+PORT)
 })
