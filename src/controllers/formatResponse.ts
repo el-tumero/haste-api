@@ -2,16 +2,16 @@ import {ResponseMessage, ResponseState, ResponseExt, ResponseMessageExtended} fr
 
 function formatResponse(state: ResponseState, message:string):ResponseMessage
 function formatResponse(state: ResponseState, message:string, ext: ResponseExt):ResponseMessageExtended
-function formatResponse(arg1:unknown, arg2:unknown, arg3?:object):any{
-    if(arg3) return {
-        arg1,
-        arg2,
-        ...arg3
+function formatResponse(state:unknown, message:unknown, ext?:object):any{
+    if(ext) return {
+        state,
+        message,
+        ...ext
     }
 
     return {
-        arg1,
-        arg2
+        state,
+        message
     }
 }
 
