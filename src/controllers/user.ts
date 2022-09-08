@@ -5,13 +5,15 @@ import { authenticator } from "otplib";
 import { AES, enc } from 'crypto-js'
 import UserLogin from "../types/UserLogin";
 import jwt from 'jsonwebtoken'
+import formatResponse from './formatResponse'
+import { ResponseMessageExtended } from "../types/ResponseMessage";
 
 
 async function getById(id:string){
-    return await User.findById(id, 'username names surname age').exec()
+    return await User.findById(id, 'username').exec()
 }
 
-async function login(user:UserLogin){
+async function login(user:UserLogin):Promise<ResponseMessageExtended>{
     try {
         await loginSchema.validateAsync(user)
         const encryptedSecret = await User.findOne({username: user.username}, 'secret').exec()
@@ -20,28 +22,17 @@ async function login(user:UserLogin){
 
         if(user.token === authenticator.generate(secret)){
             const sessionToken = jwt.sign({username: user.username}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
-
-            return {
-                state: "Done",
-                message: "Logged in!",
-                sessionToken
-            }
+            return formatResponse("done", "Logged in!", {sessionToken})
         }
-        return {
-            state: "Error",
-            message: "Not valid credentials!"
-        }
+        return formatResponse("error", "Not valid credentials!")
 
     } catch (err) {
-        return {
-            state: "Error",
-            message: "Error with decryption or authentication!"
-        }
+        return formatResponse("error", "Error with decryption or authentication!")
     }
     
 }
 
-async function create(user:UserCreation){
+async function create(user:UserCreation):Promise<ResponseMessageExtended>{
     try{
 
         await createSchema.validateAsync(user)
@@ -51,17 +42,10 @@ async function create(user:UserCreation){
             secret: user.secret
         })
 
-        return {
-            state: "Done",
-            message: "Succesfully created a user!",
-            id: _id
-        }
+        return formatResponse("done", "Succesfully created a user!", {id: _id.toString()})
 
     }catch(err){
-        return {
-            state: "Error",
-            message: err
-        }
+        return formatResponse("error", "Error!")
     }
 }
 
