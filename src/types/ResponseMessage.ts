@@ -1,9 +1,10 @@
 
-export type ResponseState = "done" | "error"
+export type ResponseState = "done" | "error" | "notfound" | "unauthorized"
 
 export interface ResponseExt {
     sessionToken?:string
     id?:string
+    username?:string
 }
 
 export interface ResponseMessage{

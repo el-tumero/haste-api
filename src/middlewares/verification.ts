@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken"
 import formatResponse from "../controllers/formatResponse";
-import statusHandler from "../routes/statusHandler";
 
 const verification = (req:Request, res:Response, next:NextFunction) => {
     console.log(123)

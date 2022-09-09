@@ -10,7 +10,14 @@ import { ResponseMessageExtended } from "../types/ResponseMessage";
 
 
 async function getById(id:string){
-    return await User.findById(id, 'username').exec()
+    try {
+        const { username } = await User.findById(id, 'username').exec()
+        return formatResponse("done", "A user with the given id has been found!", {id, username})
+    }
+    catch (err) {
+        return formatResponse("notfound", "User with given id doesn't exists!")
+    }
+    
 }
 
 async function login(user:UserLogin):Promise<ResponseMessageExtended>{
@@ -24,7 +31,7 @@ async function login(user:UserLogin):Promise<ResponseMessageExtended>{
             const sessionToken = jwt.sign({username: user.username}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
             return formatResponse("done", "Logged in!", {sessionToken})
         }
-        return formatResponse("error", "Not valid credentials!")
+        return formatResponse("unauthorized", "Not valid credentials!")
 
     } catch (err) {
         return formatResponse("error", "Error with decryption or authentication!")
