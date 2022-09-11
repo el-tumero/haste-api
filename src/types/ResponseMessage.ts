@@ -1,5 +1,5 @@
 
-export type ResponseState = "done" | "error" | "notfound" | "unauthorized"
+export type ResponseState = "done" | "error" | "notfound" | "unauthorized" | "conflict"
 
 export interface ResponseExt {
     sessionToken?:string

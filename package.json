@@ -7,7 +7,7 @@
   "scripts": {
     "start": "NODE_ENV=production node ./dist/index.js",
     "pm2": "NODE_ENV=production pm2 start ./dist/index.js",
-    "test": "jest --maxWorkers=1",
+    "test": "jest",
     "build": "tsc",
     "dev": "NODE_ENV=development nodemon ./src/index.ts"
   },

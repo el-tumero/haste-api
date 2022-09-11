@@ -9,6 +9,7 @@ import formatResponse from './formatResponse'
 import { ResponseMessageExtended } from "../types/ResponseMessage";
 
 
+
 async function getById(id:string){
     try {
         const { username } = await User.findById(id, 'username').exec()
@@ -45,13 +46,22 @@ async function create(user:UserCreation):Promise<ResponseMessageExtended>{
         await createSchema.validateAsync(user)
 
         const {_id} = await User.create({
-            username: user.username,
-            secret: user.secret
+          username: user.username,
+          secret: user.secret
         })
-
+        
         return formatResponse("done", "Succesfully created a user!", {id: _id.toString()})
-
+       
     }catch(err){
+
+        if(err.name === "MongoServerError" && err.code === 11000 ){
+            return formatResponse("conflict", "User with given username already exists!")
+        }
+
+        if(err.name === "ValidationError") {
+            return formatResponse("conflict", err.details[0].message)
+        }
+
         return formatResponse("error", "Error!")
     }
 }
