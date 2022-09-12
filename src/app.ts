@@ -15,6 +15,8 @@ app.use(cookieParser())
 
 app.use("/user", routes.user)
 
+app.use("/profile", routes.profile)
+
 app.get("/", (req, res) => {
     res.send("haste-api")
 })
