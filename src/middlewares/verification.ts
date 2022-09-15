@@ -22,7 +22,7 @@ const verification = (req:RequestWithUsername, res:Response, next:NextFunction) 
 }
 
 const sendVerificationError = (res:Response) => {
-    const data = formatResponse("error", "Verification error!")
+    const data = formatResponse("unauthorized", "Verification error!")
     res.status(401)
     res.json(data)
 }

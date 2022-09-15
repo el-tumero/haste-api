@@ -92,6 +92,19 @@ describe("Test the /profile (POST) path", () => {
     })
   })
 
+  test("It should returns an error (passed object doesn't match schema)", done => {
+    request(app)
+    .post("/profile")
+    .send({
+      firstName: "Test2"
+    })
+    .set("Cookie", [user.jwt])
+    .then(response => {
+      expect(response.statusCode).toBe(409);
+      done()
+    })
+  })
+
   test("It should returns an error (unauthorized)", done => {
     request(app)
     .post("/profile")
