@@ -5,7 +5,7 @@ declare global {
     interface ProcessEnv {
         PRIVATE_KEY: string
         MONGO_URI: string
-        PORT: number
+        PORT: string
         ENV: 'test' | 'development' | 'production';
     }
   }
