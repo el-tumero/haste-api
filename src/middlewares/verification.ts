@@ -2,12 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken"
 import formatResponse from "../controllers/formatResponse";
 
-const verification = (req:Request, res:Response, next:NextFunction) => {
-    console.log(123)
+export interface RequestWithUsername extends Request {
+    username: string
+}
+
+const verification = (req:RequestWithUsername, res:Response, next:NextFunction) => {
     if(req.cookies.sessionToken){
         try {
-            jwt.verify(req.cookies.sessionToken, process.env.PRIVATE_KEY)
-            // can save username to cookie eventually
+            const { username } = jwt.verify(req.cookies.sessionToken, process.env.PRIVATE_KEY) as {username:string, iat:number, exp:number}
+            req.username = username
             next()
             return
         } catch (error) {

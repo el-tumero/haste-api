@@ -1,8 +1,12 @@
 export default interface ProfileBase {
     firstName:string
-    secondName?:string
-    surname:string
-    birthDate: Date
-    localization:string,
+    localization:string
+    birthDate:Date
     sex:string
+    target:string
+    intimacy:string
+    photos: string[]
+    interests:string[]
+    socials:string[]
+    bio:string
 }

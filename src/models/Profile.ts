@@ -5,14 +5,6 @@ const schema = new Schema<ProfileBase>({
         type: String,
         required: true
     },
-    secondName: {
-        type: String,
-        required: false
-    },
-    surname: {
-        type: String,
-        required: true
-    },
     birthDate: {
         type: Date,
         require: true 
@@ -24,7 +16,32 @@ const schema = new Schema<ProfileBase>({
     sex: {
         type: String,
         required: true
+    },
+    target: {
+        type: String,
+        required: true
+    },
+    intimacy: {
+        type: String,
+        required: true
+    },
+    photos: {
+        type: [String],
+        required: true
+    },
+    interests: {
+        type: [String],
+        required: true
+    },
+    socials: {
+        type: [String],
+        required: true
+    },
+    bio: {
+        type: String,
+        required: true
     }
+
 })
 
 const Profile = model("Profile", schema)

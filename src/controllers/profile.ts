@@ -2,16 +2,13 @@
 
 // }
 
-import ProfileCreation from "../types/ProfileCreation";
+
 import Profile from "../models/Profile";
 import User from "../models/User";
 import formatResponse from "./formatResponse";
 import ProfileBase from "../types/ProfileBase";
 
-async function create(profileCreation:ProfileCreation){
-
-    // only one profile per user!
-    const {username, ...profileData} = profileCreation
+async function create(username:string, profileData:ProfileBase){
 
     try {
         const user = await User.findOne({username, profile: {$exists: false}})
