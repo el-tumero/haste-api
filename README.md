@@ -1,5 +1,63 @@
 # Haste Project API
 
+## Usage
+
+- [/user] route
+  - /user (POST) - account creation - request body:
+    - username - account name
+    - secret - RFC3548 secret encoded by user **password**
+
+    NOTE: **password** must be at least 8 characters long!
+
+  ```typescript
+    {
+        username: string,
+        secret: string
+    }
+  ```
+
+  - /user/login (POST) - login - request body:
+    - username - account name
+    - password - password provided when creating the account
+    - token - 6-digit token from the authenticator app
+
+    **Returns JWT** inside "Set-Cookie" header
+
+  ```typescript
+    {
+        username: string,
+        password: string,
+        token: string
+    }
+  ```
+
+- [/profile] route
+  - /profile (POST) - profile creation - request body:
+  
+    **JWT must be provided inside Cookie header**
+
+  ```typescript
+    {
+        firstName:string
+        localization:string
+        birthDate:Date
+        sex:string
+        target:string
+        intimacy:string
+        photos: string[]
+        interests:string[]
+        socials:string[]
+        bio:string
+    }
+  ```
+
+  - /profile (GET) - returns logged user's profile
+
+    **JWT must be provided inside Cookie header**
+
+  - /profile/user/`<username>` (GET) - returns the profile of the user specified in the `username` param
+
+
 ## What is done?
 
 - ✅  MVC project structure
