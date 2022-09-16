@@ -38,16 +38,16 @@
 
   ```typescript
     {
-        firstName:string
-        location:string
-        birthDate:Date
-        sex:string
-        target:string
-        intimacy:string
-        photos: string[]
-        interests:string[]
-        socials:string[]
-        bio:string
+        firstName: string,
+        location: string,
+        birthDate: Date,
+        sex: string,
+        target: string,
+        intimacy: string,
+        photos: string[],
+        interests: string[],
+        socials: string[],
+        bio: string
     }
   ```
 
