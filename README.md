@@ -39,7 +39,7 @@
   ```typescript
     {
         firstName:string
-        localization:string
+        location:string
         birthDate:Date
         sex:string
         target:string
@@ -57,7 +57,6 @@
 
   - /profile/user/`<username>` (GET) - returns the profile of the user specified in the `username` param
 
-
 ## What is done?
 
 - ✅  MVC project structure
@@ -69,5 +68,7 @@
 - 🟨  Profiles
 
 ## To do?
+
+- ➡️ Geospartial Queries
 
 - ➡️ Add WebRTC for communication

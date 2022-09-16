@@ -1,6 +1,6 @@
 export default interface ProfileBase {
     firstName:string
-    localization:string
+    location:any
     birthDate:Date
     sex:string
     target:string

@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 import ProfileBase from "../types/ProfileBase";
-const schema = new Schema<ProfileBase>({
+import pointSchema from "./schemas/pointSchema";
+const schema = new Schema({
     firstName: {
         type: String,
         required: true
@@ -9,8 +10,8 @@ const schema = new Schema<ProfileBase>({
         type: Date,
         require: true 
     },
-    localization: {
-        type: String,
+    location: {
+        type: pointSchema,
         required: true
     },
     sex: {

@@ -1,16 +1,17 @@
 import Profile from "../models/Profile";
 import User from "../models/User";
 import formatResponse from "./formatResponse";
-import ProfileBase from "../types/ProfileBase";
+import ProfileInput from "../types/ProfileInput";
 import Joi from "joi";
+import ProfileCreation from "../types/ProfileCreation";
 
-async function create(username:string, profileData:ProfileBase){
+async function create(username:string, profileData:ProfileInput){
 
     try {
         await createProfileSchema.validateAsync(profileData)
         const user = await User.findOne({username, profile: {$exists: false}})
         if(user){
-            const profile = await Profile.create(profileData)
+            const profile = await Profile.create({...profileData, location: {type: "Point", coordinates: profileData.location}})
             await User.updateOne({username}, {profile})
             return formatResponse("done", "Profile successfully created!")
         }
@@ -19,6 +20,8 @@ async function create(username:string, profileData:ProfileBase){
         if(error.name === "ValidationError") {
             return formatResponse("conflict", error.details[0].message)
         }
+
+
 
         return formatResponse("error", "Something went wrong!") 
     }
@@ -33,7 +36,7 @@ async function getByUsername(username:string){
         })
         .select("profile -_id")
         
-        if(data.profile) return formatResponse("done", "User's profile data", {profile: data.profile as ProfileBase})
+        if(data.profile) return formatResponse("done", "User's profile data", {profile: data.profile as ProfileCreation})
 
         return formatResponse("notfound", "Profile not found!")
         
@@ -42,9 +45,9 @@ async function getByUsername(username:string){
     }
 }
 
-const createProfileSchema = Joi.object<ProfileBase, true, ProfileBase>({
+const createProfileSchema = Joi.object<ProfileInput, true, ProfileInput>({
     firstName: Joi.string().alphanum().min(2).max(30).required(),
-    localization: Joi.string().required(),
+    location: Joi.array().items(Joi.number()).length(2).required(),
     birthDate: Joi.date().required(),
     sex: Joi.string().required(),
     target: Joi.string().alphanum().required(),

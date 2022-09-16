@@ -1,16 +1,18 @@
 import request from "supertest"
 import app from "../app"
-import {describe, expect, test, afterAll, beforeEach} from '@jest/globals'
+import {describe, expect, test, afterAll, beforeAll} from '@jest/globals'
 import mongoose from "mongoose"
 import User from "../models/User"
 import {authenticator} from "otplib"
 import { AES } from "crypto-js"
-import ProfileBase from "../types/ProfileBase"
-import UserBase from "../types/UserBase"
 import Profile from "../models/Profile"
+import ProfileInput from "../types/ProfileInput"
 
-mongoose.connect(process.env.MONGO_URI as string)
-.catch(err => console.log(err))
+beforeAll(done => {
+  mongoose.connect(process.env.MONGO_URI as string)
+  .then(() => done())
+  .catch(err => console.log(err))
+})
 
 const user = {
   id: "",
@@ -20,10 +22,13 @@ const user = {
   jwt: ""
 }
 
-const profile:ProfileBase = {
+const profile:ProfileInput = {
   firstName: "Test",
   birthDate: new Date("1999-12-12"),
-  localization: "Testing Site",
+  location: [
+    -122.5,
+    37.7
+  ],
   sex: "male",
   target: "friendships",
   intimacy: "yes",
@@ -178,16 +183,33 @@ describe("Test the /profile/test (GET) path", () => {
       done()
     })
   })
-
-
 })
+
+describe("Location test", () => {
+  test("It should returns user in range", done => {
+    Profile.findOne({location: {
+      $near: {
+        $maxDistance: 100000,
+        $geometry: {type: "Point", coordinates: [-122, 37]}
+      }
+    }}).then(data => {
+      expect(data?.firstName).toEqual("Test")
+      done()  
+    })
+  })
+})
+
+
 
 afterAll(done => {
   User.findOneAndDelete({username: user.username}, async(err:Error, doc:any) => {
-    await Profile.deleteOne({_id: doc.profile})
-    mongoose.connection.close()
+    if(doc){
+      await Profile.deleteOne({_id: doc.profile})
+    }
+    mongoose.connection.close() 
     done()
-  })    
+  }) 
+ 
 })
 
 
