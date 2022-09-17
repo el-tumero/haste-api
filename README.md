@@ -39,7 +39,7 @@
   ```typescript
     {
         firstName: string,
-        location: string,
+        location: [number, number],
         birthDate: Date,
         sex: string,
         target: string,
