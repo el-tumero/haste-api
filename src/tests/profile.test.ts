@@ -132,10 +132,21 @@ describe("Test the /profile/user/:username (GET) path", () => {
     })
   })
 
+  test("It should returns an error (profile does not exist)", done => {
+    request(app)
+    .get("/profile/user/" + "test")
+    .then(response => {
+      expect(response.body.message).toEqual("Profile not found!")
+      expect(response.statusCode).toBe(404);
+      done()
+    })
+  })
+
   test("It should returns an error", done => {
     request(app)
     .get("/profile/user/" + "404")
     .then(response => {
+      expect(response.body.message).toEqual("User not found!")
       expect(response.statusCode).toBe(404);
       done()
     })
@@ -185,21 +196,41 @@ describe("Test the /profile/test (GET) path", () => {
   })
 })
 
-describe("Location test", () => {
-  test("It should returns user in range", done => {
-    Profile.findOne({location: {
-      $near: {
-        $maxDistance: 100000,
-        $geometry: {type: "Point", coordinates: [-122, 37]}
-      }
-    }}).then(data => {
-      expect(data?.firstName).toEqual("Test")
-      done()  
+
+describe("Test the /profile/nearby (GET) path", () => {
+  test("It should returns profiles of nearby users (5 km radius)", done => {
+    request(app)
+    .get("/profile/nearby?radius=5")
+    .set("Cookie", [user.jwt])
+    .then(response => {
+      expect(response.body).toHaveProperty("profiles")
+      expect(response.statusCode).toBe(200);
+      done()
     })
   })
+
+  test("It should returns error (radius is not defined)", done => {
+    request(app)
+    .get("/profile/nearby")
+    .set("Cookie", [user.jwt])
+    .then(response => {
+      expect(response.statusCode).toBe(400);
+      done()
+    })
+  })
+
+  test("It should returns error (radius is not valid)", done => {
+    request(app)
+    .get("/profile/nearby?radius=-10")
+    .set("Cookie", [user.jwt])
+    .then(response => {
+      expect(response.statusCode).toBe(400);
+      done()
+    })
+  })
+
+ 
 })
-
-
 
 afterAll(done => {
   User.findOneAndDelete({username: user.username}, async(err:Error, doc:any) => {

@@ -23,6 +23,13 @@ profile.get("/user/:username", async (req, res) => {
     res.json(data)
 })
 
+profile.get("/nearby", verification, async (req:RequestWithUsername, res) => {
+    const radius = req.query.radius as string
+    const data = await controllers.profile.getByLocation(req.username, radius)
+    statusHandler(data.state, res)
+    res.json(data)
+})
+
 profile.get("/test", verification, async (req, res) => {
     res.status(200).json({"status": "done"})
 })

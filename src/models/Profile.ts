@@ -1,7 +1,8 @@
 import { model, Schema } from "mongoose";
+import ProfileCreation from "../types/ProfileCreation";
 import ProfileBase from "../types/ProfileBase";
 import pointSchema from "./schemas/pointSchema";
-const schema = new Schema({
+const schema = new Schema<ProfileCreation>({
     firstName: {
         type: String,
         required: true

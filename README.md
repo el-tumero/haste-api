@@ -57,6 +57,8 @@
 
   - /profile/user/`<username>` (GET) - returns the profile of the user specified in the `username` param
 
+  - /profile/nearby?radius=`<radius in meters>` (GET) - returns profiles of every user in nearby area of requesting user
+
 ## What is done?
 
 - ✅  MVC project structure
@@ -66,9 +68,10 @@
 - ✅  Generating JWT after login (JWT Web Token)
 - ✅  Middleware for validating JWT
 - 🟨  Profiles
+- 🟨  Geospartial Queries
 
 ## To do?
 
-- ➡️ Geospartial Queries
+- ➡️ Matching algorithm (AI & more)
 
 - ➡️ Add WebRTC for communication
