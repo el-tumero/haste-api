@@ -14,7 +14,14 @@ const schema = new Schema({
         type: Types.ObjectId,
         ref: "Profile",
         required: false
+    },
+    uid: {
+        type: [String]
+    },
+    banned: {
+        type: Boolean
     }
+
 })
 
 const User = model("User", schema)

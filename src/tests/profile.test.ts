@@ -3,10 +3,13 @@ import app from "../app"
 import {describe, expect, test, afterAll, beforeAll} from '@jest/globals'
 import mongoose from "mongoose"
 import User from "../models/User"
-import {authenticator} from "otplib"
-import { AES } from "crypto-js"
+
+
 import Profile from "../models/Profile"
-import ProfileInput from "../types/ProfileInput"
+
+import { createUser, UserTest } from "./createUser"
+
+import testUsers from "./users"
 
 beforeAll(done => {
   mongoose.connect(process.env.MONGO_URI as string)
@@ -14,61 +17,17 @@ beforeAll(done => {
   .catch(err => console.log(err))
 })
 
-const user = {
-  id: "",
-  username: "testtt",
-  password: "12345678",
-  secret: "",
-  jwt: ""
-}
-
-const profile:ProfileInput = {
-  firstName: "Test",
-  birthDate: new Date("1999-12-12"),
-  location: [
-    -122.5,
-    37.7
-  ],
-  sex: "male",
-  target: "friendships",
-  intimacy: "yes",
-  photos: ["base64photo1, base64photo2"],
-  interests: ["testing apis"],
-  socials: ["@test"],
-  bio: "Testing in progress..."
-}
+const user = testUsers.users[0]
+const profile = testUsers.profiles[0]
 
 // Creating a user
 
-describe("Test the /user (POST) path", () => {
-  test("It should creates a new user", done => {
-    const bareSecret = authenticator.generateSecret()
-    user.secret = bareSecret
-    const secret = AES.encrypt(bareSecret, user.password).toString()
-    request(app)
-    .post("/user")
-    .send({username: user.username, secret})
-    .then(response => {
-      user.id = response.body.id
-      expect(response.statusCode).toBe(200);
-        done()
-    })
-  })
-})
-
-// Login
-
-describe("Test the /user/login (POST) path", () => {
-  test("It should login to a user account", done => {
-    const token = authenticator.generate(user.secret)
-    request(app)
-    .post("/user/login")
-    .send({username: user.username, password: user.password, token})
-    .then(response => {
-      user.jwt = response.headers["set-cookie"][0]
-      expect(response.statusCode).toBe(200);
-        done()
-    })
+describe("Init", () => {
+  test("It should create new user", done => {
+      createUser(user).then(({jwt}) => {
+          user.jwt = jwt
+          done()
+      })
   })
 })
 

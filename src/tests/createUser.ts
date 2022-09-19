@@ -8,9 +8,10 @@ interface UserTest {
     username: string
     password: string
     jwt: string
+    uid: string
 }
 
-async function createUser(user:UserTest, profile:ProfileInput) {
+async function createUser(user:UserTest, profile?:ProfileInput) {
     const bareSecret = authenticator.generateSecret()
     const secret = AES.encrypt(bareSecret, user.password).toString()
 
@@ -19,12 +20,14 @@ async function createUser(user:UserTest, profile:ProfileInput) {
 
     // login
     const token = authenticator.generate(bareSecret)
-    const response = await request(app).post("/user/login").send({username: user.username, password: user.password, token})
+    const response = await request(app).post("/user/login").send({username: user.username, password: user.password, token, uid: user.uid})
     const jwt = response.headers["set-cookie"][0]
 
-    await request(app).post("/profile").send(profile).set("Cookie", [jwt])
-
-    return jwt
+    if(profile){
+        await request(app).post("/profile").send(profile).set("Cookie", [jwt])
+    }
+    
+    return {jwt, bareSecret}
 }
 
 export {UserTest, createUser}

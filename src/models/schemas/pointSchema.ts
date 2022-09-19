@@ -10,6 +10,6 @@ const pointSchema = new Schema({
       type: [Number],
       required: true
     }
-});
+}, {_id: false});
 
 export default pointSchema

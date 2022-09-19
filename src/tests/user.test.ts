@@ -3,54 +3,45 @@ import app from "../app"
 import {describe, expect, test, afterAll, beforeEach} from '@jest/globals'
 import mongoose from "mongoose"
 import { authenticator } from "otplib" 
-// import formatResponse from "../controllers/formatResponse"
+import { v4 as uuid4 } from "uuid"
+import { AES } from "crypto-js"
+import User from "../models/User"
+
 
 mongoose.connect(process.env.MONGO_URI as string)
 .catch(err => console.log(err))
 
-const testUser = {
-  id: "631b15d64e57945afbcd89b9",
-  username: "test",
+const user = {
+  username: "teeest",
   password: "12345678",
-  secret: "GAXG65LYNEZW25DU"
+  secret: "",
+  uid: uuid4()
 }
 
-// /user/:id
-
-describe("Test the /user/:id (GET) path", () => {
-  test("It should response with user data", done => {
-    request(app)
-      .get("/user/" + testUser.id)
-      .then(response => {
-        expect(response.body).toEqual(
-          expect.objectContaining({id: testUser.id, username: testUser.username})
-        )
-        expect(response.statusCode).toBe(200);
-        done()
-      });
-  });
-
-  test("It should response with error", done => {
-    request(app)
-      .get("/user/" + "test_test")
-      .then(response => {
-        expect(response.body).toEqual(
-          expect.objectContaining({state: "notfound"})
-        )
-        expect(response.statusCode).toBe(404);
-        done()
-      });
-  });
-
-});
+// secret: "GAXG65LYNEZW25DU",
 
 // /user
 
 describe("Test the /user (POST) path (creating account)", () => {
+
+  test("It should creates a new user", done => {
+    const bareSecret = authenticator.generateSecret()
+    user.secret = bareSecret
+    const secret = AES.encrypt(bareSecret, user.password).toString()
+    request(app)
+    .post("/user")
+    .send({username: user.username, secret})
+    .then(response => {
+      expect(response.statusCode).toBe(200);
+      done()
+    })
+  })
+
+
   test("It should response with error and message 'User with given username already exists!'", done => {
     request(app)
       .post("/user")
-      .send({username: testUser.username, secret: testUser.secret})
+      .send({username: user.username, secret: user.secret})
       .then(response => {
         expect(response.body).toEqual(
           expect.objectContaining({state: "conflict", message: "User with given username already exists!"})
@@ -79,10 +70,10 @@ describe("Test the /user (POST) path (creating account)", () => {
 
 describe("Test the /user/login (POST) path", () => {
   test("It should response with 'done' state and auth cookies in headers", done => {
-    const token = authenticator.generate(testUser.secret)
+    const token = authenticator.generate(user.secret)
     request(app)
       .post("/user/login")
-      .send({username: testUser.username, password: testUser.password, token})
+      .send({username: user.username, password: user.password, token, uid: user.uid})
       .then(response => {
         expect(response.body).toEqual(
           expect.objectContaining({state: "done"})
@@ -91,12 +82,37 @@ describe("Test the /user/login (POST) path", () => {
         done()
       })
   })
+
+  test("It should response with error (more than 3 deviced connected with account)", done => {
+    (async function() {
+      let token = authenticator.generate(user.secret)
+      await request(app)
+        .post("/user/login")
+        .send({username: user.username, password: user.password, token, uid: uuid4()})
+      
+      token = authenticator.generate(user.secret)
+      await request(app)
+        .post("/user/login")
+        .send({username: user.username, password: user.password, token, uid: uuid4()})
+      
+      token = authenticator.generate(user.secret)
+      const response = await request(app)
+      .post("/user/login")
+      .send({username: user.username, password: user.password, token, uid: uuid4()})
+      
+      expect(response.statusCode).toEqual(409)
+      done()
+    })()  
+    })
 })
 
 
+
 afterAll(done => {
-  mongoose.connection.close()
-  done()
+  User.findOneAndDelete({username: user.username}, async(err:Error, doc:any) => {
+    mongoose.connection.close() 
+    done()
+  }) 
 })
 
 

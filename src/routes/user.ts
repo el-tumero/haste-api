@@ -5,12 +5,6 @@ import cookieSettings from "./utils/cookieSettings";
 
 const user = Router()
 
-user.get("/:id", async (req, res) => {
-    const data = await controllers.user.getById(req.params.id)
-    statusHandler(data.state, res)
-    res.json(data)
-})
-
 user.post("/login", async(req, res) => {
     const {sessionToken, ...data}= await controllers.user.login(req.body) 
     if(sessionToken) res.cookie("sessionToken", sessionToken, cookieSettings)

@@ -8,24 +8,16 @@ import jwt from 'jsonwebtoken'
 import formatResponse from './formatResponse'
 import { ResponseMessageExtended } from "../types/ResponseMessage";
 
-
-
-async function getById(id:string){
-    try {
-        const { username } = await User.findById(id, 'username').exec()
-        return formatResponse("done", "A user with the given id has been found!", {id, username})
-    }
-    catch (err) {
-        return formatResponse("notfound", "User with given id doesn't exists!")
-    }
-    
-}
-
 async function login(user:UserLogin):Promise<ResponseMessageExtended>{
     try {
         await loginSchema.validateAsync(user)
-        const encryptedSecret = await User.findOne({username: user.username}, 'secret').exec()
-        const bytes = AES.decrypt(encryptedSecret.secret, user.password)
+        const foundUser = await User.findOne({username: user.username})
+
+        if(foundUser.banned) return formatResponse("conflict", "Your account is permanently banned!")
+        if(foundUser.uid.length >= 3) return formatResponse("conflict", "You cannot log in on more than 3 devices!") 
+        if(!foundUser.uid.includes(user.uid)) await User.updateOne({username: user.username}, {$push: {uid: user.uid}})
+
+        const bytes = AES.decrypt(foundUser.secret, user.password)
         const secret = bytes.toString(enc.Utf8)
 
         if(user.token === authenticator.generate(secret)){
@@ -74,11 +66,11 @@ const createSchema = Joi.object<UserCreation, true, UserCreation>({
 const loginSchema = Joi.object<UserLogin, true, UserLogin>({
     username: Joi.string().alphanum().min(3).max(20).required(),
     password: Joi.string().min(8).required(),
-    token: Joi.string().alphanum().length(6).required()
+    token: Joi.string().alphanum().length(6).required(),
+    uid: Joi.string().required()
 })
 
 export default {
-    getById,
     create,
     login
 }
