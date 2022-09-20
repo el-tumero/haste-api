@@ -7,11 +7,23 @@ import UserLogin from "../types/UserLogin";
 import jwt from 'jsonwebtoken'
 import formatResponse from './formatResponse'
 import { ResponseMessageExtended } from "../types/ResponseMessage";
+import Ban from "../models/Ban";
+import { checkIfUidIsBanned, giveBan, giveUidBan } from "./ban";
 
 async function login(user:UserLogin):Promise<ResponseMessageExtended>{
     try {
         await loginSchema.validateAsync(user)
+
+        const isUidBanned = await checkIfUidIsBanned(user.uid)
+
+        if(isUidBanned) {
+            giveBan(user.username)
+        }
+
         const foundUser = await User.findOne({username: user.username})
+
+        if(foundUser.uid.includes)
+        
 
         if(foundUser.banned) return formatResponse("conflict", "Your account is permanently banned!")
         if(foundUser.uid.length >= 3) return formatResponse("conflict", "You cannot log in on more than 3 devices!") 

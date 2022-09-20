@@ -20,6 +20,7 @@
     - username - account name
     - password - password provided when creating the account
     - token - 6-digit token from the authenticator app
+    - uid - unique device identifier
 
     **Returns JWT** inside "Set-Cookie" header
 
@@ -27,7 +28,8 @@
     {
         username: string,
         password: string,
-        token: string
+        token: string,
+        uid: string
     }
   ```
 
@@ -69,6 +71,7 @@
 - ✅  Middleware for validating JWT
 - 🟨  Profiles
 - 🟨  Geospartial Queries
+- ✅  Ban
 
 ## To do?
 
