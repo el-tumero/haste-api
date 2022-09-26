@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package matchPackage;
+
+service Match {
+    rpc getChance(Personalities) returns (Reply);
+}
+
+message Reply {
+    float chance = 1;
+}
+
+message Personalities {
+    repeated int32 first = 1;
+    repeated int32 second = 2;
+}
