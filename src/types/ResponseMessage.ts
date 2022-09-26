@@ -7,8 +7,8 @@ export interface ResponseExt {
     sessionToken?:string
     id?:string
     username?:string
-    profile?: ProfileCreation
-    profiles?: ProfileCreation[]
+    profile?: ProfileBase
+    profiles?: ProfileBase[]
 }
 
 export interface ResponseMessage{

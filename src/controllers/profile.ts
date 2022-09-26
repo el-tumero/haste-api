@@ -21,9 +21,7 @@ async function create(username:string, profileData:ProfileInput){
         if(error.name === "ValidationError") {
             return formatResponse("conflict", error.details[0].message)
         }
-
-
-
+        
         return formatResponse("error", "Something went wrong!") 
     }
 
@@ -33,11 +31,11 @@ async function getByUsername(username:string){
     try {
         const data = await User.findOne({username}).populate({
             path: "profile",
-            select: "-_id -__v"
+            select: "-_id -__v -location"
         })
         .select("profile -_id")
 
-        const profile = data.profile as ProfileCreation
+        const profile = data.profile as ProfileBase
         
         if(profile) return formatResponse("done", "User's profile data", {profile})
 
@@ -70,7 +68,9 @@ async function getByLocation(username: string, radius: string) {
             }})
             .select("-_id -location -__v")
 
-            return formatResponse("done", "Profiles found!", {profiles: data})
+            const profiles = data as ProfileBase[]
+
+            return formatResponse("done", "Profiles found!", {profiles}) // ProfileBase[]
         }
 
         return formatResponse("error", "Profile not created!")
