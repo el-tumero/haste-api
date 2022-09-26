@@ -17,12 +17,12 @@ async function login(user:UserLogin):Promise<ResponseMessageExtended>{
         const isUidBanned = await checkIfUidIsBanned(user.uid)
 
         if(isUidBanned) {
-            giveBan(user.username)
+            await giveBan(user.username)
         }
 
         const foundUser = await User.findOne({username: user.username})
 
-        if(foundUser.uid.includes)
+        // if(foundUser.uid.includes)
         
 
         if(foundUser.banned) return formatResponse("conflict", "Your account is permanently banned!")

@@ -22,7 +22,8 @@ const profile1:ProfileInput = {
     photos: ["base64photo1, base64photo2"],
     interests: ["testing apis"],
     socials: ["@test"],
-    bio: "Testing in progress..."
+    bio: "Testing in progress...",
+    personality: [12, 13, 83, 8, 94, 39, 37, 60, 6, 31]
 }
 
 const user2:UserTest = {
@@ -45,7 +46,8 @@ const profile2:ProfileInput = {
     photos: ["base64photo1, base64photo2"],
     interests: ["testing apis & more"],
     socials: ["@tset"],
-    bio: "Testing in progress..."
+    bio: "Testing in progress...",
+    personality: [60, 44, 93, 34, 26, 86, 98, 97, 84, 86]
 }
 
 export default { users: [user1, user2], profiles: [profile1, profile2]}

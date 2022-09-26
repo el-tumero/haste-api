@@ -59,8 +59,9 @@ describe("Banning user", () => {
 })
 
 describe("Unbanning user", () => {
-    test("It should unbans user", async() => {
-        await unban(user.username)
+    test("It should unbans user", done => {
+        unban(user.username)
+        .then(() => done())
     }) 
 })
 
@@ -84,15 +85,11 @@ describe("Advanced banning", () => {
         })
     })
 
-    test("It should bans user", done => {
+    test("It should ban user", done => {
         giveBan(user.username)
-        .then(() => {
-            Ban.find({}).then(data => {
-                expect(data.length).toEqual(2)
-                done()
-            })
-        })
+        .then(() => done())
     })
+
 
     test("It should response with error (given uuid is banned)", done => {
         const token = authenticator.generate(secondUserBareSecret)
@@ -100,26 +97,24 @@ describe("Advanced banning", () => {
         .post("/user/login")
         .send({username: secondUser.username, password: secondUser.password, token, uid: user.uid}) // user1 uid
         .then(response => {
+            // console.log(response.body)
             expect(response.statusCode).toEqual(409)
             done()
         })
     })
 
-    test("It should unbans users and uids", done => {
-        unban(secondUser.username).then(() => {
-            unban(user.username).then(() => done())
-        })
-        
-    })
-    
 })
 
 
-afterAll(done => {
+
+
+afterAll(async() => {
+    await unban(secondUser.username)
+    await unban(user.username)
+
     deleteUser(user, () => {
         deleteUser(secondUser, () => {
             mongoose.connection.close()
-            done()
         })
     })
 

@@ -5,4 +5,5 @@ export default interface ProfileCreation extends ProfileBase {
         type: "Point",
         coordinates: [number, number]
     }
+    personality:number[]
 }

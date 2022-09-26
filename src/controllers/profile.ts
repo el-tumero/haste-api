@@ -21,7 +21,7 @@ async function create(username:string, profileData:ProfileInput){
         if(error.name === "ValidationError") {
             return formatResponse("conflict", error.details[0].message)
         }
-        
+
         return formatResponse("error", "Something went wrong!") 
     }
 
@@ -91,8 +91,11 @@ const createProfileSchema = Joi.object<ProfileInput, true, ProfileInput>({
     photos: Joi.array().items(Joi.string()).required(),
     interests: Joi.array().items(Joi.string().max(25)).required(),
     socials: Joi.array().items(Joi.string().max(35)).required(),
-    bio: Joi.string().max(255).required()
+    bio: Joi.string().max(255).required(),
+    personality: Joi.array().items(Joi.number().min(0).max(100).precision(0)).length(10).required()
 })
+
+// ambition, confidence, patience, kindness, creativity, resposibility, optimism, courage, modesty, perseverance
 
 export default {
     create,

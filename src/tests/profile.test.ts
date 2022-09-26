@@ -85,6 +85,7 @@ describe("Test the /profile/user/:username (GET) path", () => {
     request(app)
     .get("/profile/user/" + user.username)
     .then(response => {
+      // console.log(response.body)
       expect(response.body.profile.firstName).toEqual("Test")
       expect(response.statusCode).toBe(200);
       done()

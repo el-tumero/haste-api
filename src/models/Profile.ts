@@ -42,8 +42,11 @@ const schema = new Schema<ProfileCreation>({
     bio: {
         type: String,
         required: true
+    },
+    personality: {
+        type: [Number],
+        required: true
     }
-
 })
 
 const Profile = model("Profile", schema)
