@@ -4,7 +4,7 @@ import {describe, expect, test, afterAll, beforeAll} from '@jest/globals'
 import mongoose from "mongoose"
 import testUsers from "./users"
 
-import {checkMatching} from "../controllers/relation"
+import {predictMatching} from "../controllers/relation"
 import { createUser } from "./createUser"
 import deleteUser from "./deleteUser"
 
@@ -32,11 +32,10 @@ describe("Init", () => {
     })
 })
 
-describe("Check matching algorithm",() => {
-    test("checkMatching()", async() => {
-        const result = await checkMatching(user1.username, user2.username)
+describe("Predict matchig algorithm",() => {
+    test("predictMatching()", async() => {
+        const result = await predictMatching(user1.username, user2.username)
         console.log(result)
-
     })
 })
 

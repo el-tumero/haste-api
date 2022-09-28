@@ -23,7 +23,7 @@ const profile1:ProfileInput = {
     interests: ["testing apis"],
     socials: ["@test"],
     bio: "Testing in progress...",
-    personality: [12, 13, 83, 8, 94, 39, 37, 60, 6, 31]
+    personality: Array(10).fill(0).map(value => value = Math.floor(Math.random() * 101))
 }
 
 const user2:UserTest = {
@@ -47,7 +47,7 @@ const profile2:ProfileInput = {
     interests: ["testing apis & more"],
     socials: ["@tset"],
     bio: "Testing in progress...",
-    personality: [60, 44, 93, 34, 26, 86, 98, 97, 84, 86]
+    personality: Array(10).fill(0).map(value => value = Math.floor(Math.random() * 101))
 }
 
 export default { users: [user1, user2], profiles: [profile1, profile2]}
