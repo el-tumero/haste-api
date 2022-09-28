@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package matchPackage;
+package suggestionPackage;
 
-service Match {
+service Suggestion {
     rpc getChance(Personalities) returns (Reply);
 }
 

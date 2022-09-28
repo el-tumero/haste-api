@@ -1,4 +1,4 @@
-// Original file: src/proto/match.proto
+// Original file: src/proto/suggestion.proto
 
 
 export interface Personalities {
