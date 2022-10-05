@@ -192,6 +192,30 @@ describe("Test the /profile/nearby (GET) path", () => {
  
 })
 
+describe("Test the /profile/edit (GET) path", () => {
+  test("It should change firstName", done => {
+    request(app)
+    .post("/profile/edit")
+    .set("Cookie", [user.jwt])
+    .send({firstName: "Jack"})
+    .then(response => {
+      expect(response.statusCode).toBe(200);
+      done()
+    })
+  })
+
+  test("It should returns Jack as firstName", done => {
+    request(app)
+    .get("/profile")
+    .set("Cookie", [user.jwt])
+    .then(response => {
+      expect(response.body.profile.firstName).toEqual("Jack")
+      expect(response.statusCode).toBe(200);
+      done()
+    })
+  })
+})
+
 afterAll(done => {
   User.findOneAndDelete({username: user.username}, async(err:Error, doc:any) => {
     if(doc){

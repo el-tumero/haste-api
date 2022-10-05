@@ -5,6 +5,7 @@ import ProfileInput from "../types/ProfileInput";
 import Joi from "joi";
 import ProfileCreation from "../types/ProfileCreation";
 import ProfileBase from "../types/ProfileBase";
+import ProfileEdit from "../types/ProfileEdit";
 
 async function create(username:string, profileData:ProfileInput){
 
@@ -27,6 +28,7 @@ async function create(username:string, profileData:ProfileInput){
 
 }
 
+// remove?
 async function getByUsername(username:string){
     try {
         const data = await User.findOne({username}).populate({
@@ -35,7 +37,7 @@ async function getByUsername(username:string){
         })
         .select("profile -_id")
 
-        const profile = data.profile as ProfileBase
+        const profile = data.profile as ProfileBase // false convertion
         
         if(profile) return formatResponse("done", "User's profile data", {profile})
 
@@ -46,29 +48,57 @@ async function getByUsername(username:string){
     }
 }
 
+async function edit(username:string, newValues:ProfileEdit){
+    try {
+
+        await editProfileSchema.validateAsync(newValues)
+
+        const data = await User.findOne({username})
+        const profileId = data.profile
+
+        if(profileId){
+            try {
+                await Profile.updateOne({_id: profileId}, newValues)
+                return formatResponse("done", "Profile updated successfully!")
+            } catch (error) {
+                return formatResponse("conflict", "Values incorrect!")
+            }
+            
+        }
+
+        return formatResponse("notfound", "Profile not found!")
+        
+    } catch (error) {
+        if(error.name === "ValidationError") {
+            return formatResponse("conflict", error.details[0].message)
+        }
+        return formatResponse("notfound", "User not found!")
+    }
+}
+
 // finds profiles near user in specified radius
 async function getByLocation(username: string, radius: string) {
 
     if(!radius || parseFloat(radius) === NaN || parseFloat(radius) < 0) return formatResponse("error", "Given radius is invalid!")
 
     try {
-        const user = await User.findOne({username}).populate({
+        const user = await User.findOne({username}).populate<{profile: ProfileCreation}>({
             path: "profile",
             select: "location -_id"
         })
         .select("profile -_id")
 
         if(user.profile){
-            const profile = user.profile as ProfileCreation
+            const profile = user.profile
             const data = await Profile.find({location: {
                 $near: {
                   $maxDistance: parseFloat(radius),
                   $geometry: {type: "Point", coordinates: profile.location.coordinates}
                 }
             }})
-            .select("-_id -location -__v")
+            .select("-_id -location -__v -personality")
 
-            const profiles = data as ProfileBase[]
+            const profiles = data as ProfileBase[] // create profile output type
 
             return formatResponse("done", "Profiles found!", {profiles}) // ProfileBase[]
         }
@@ -80,6 +110,18 @@ async function getByLocation(username: string, radius: string) {
     }
      
 }
+
+const editProfileSchema = Joi.object<ProfileEdit, true, ProfileEdit>({
+    firstName: Joi.string().alphanum().min(2).max(30),
+    birthDate: Joi.date(),
+    sex: Joi.string(),
+    target: Joi.string().alphanum(),
+    intimacy: Joi.string().alphanum(),
+    photos: Joi.array().items(Joi.string()),
+    interests: Joi.array().items(Joi.string().max(25)),
+    socials: Joi.array().items(Joi.string().max(35)),
+    bio: Joi.string().max(255),
+})
 
 const createProfileSchema = Joi.object<ProfileInput, true, ProfileInput>({
     firstName: Joi.string().alphanum().min(2).max(30).required(),
@@ -99,6 +141,7 @@ const createProfileSchema = Joi.object<ProfileInput, true, ProfileInput>({
 
 export default {
     create,
+    edit,
     getByUsername,
     getByLocation
 }

@@ -20,24 +20,28 @@ beforeAll(done => {
     .catch(err => console.log(err))
 })
 
-describe("Init", () => {
-    test("It should create two new users with profiles", done => {
-        createUser(user1, profile1).then(obj1 => {
-            user1.jwt = obj1.jwt
-            createUser(user2, profile2).then(obj2 => {
-                user2.jwt = obj2.jwt
-                done()
+describe.skip("skip", () => {
+    describe("Init", () => {
+        test("It should create two new users with profiles", done => {
+            createUser(user1, profile1).then(obj1 => {
+                user1.jwt = obj1.jwt
+                createUser(user2, profile2).then(obj2 => {
+                    user2.jwt = obj2.jwt
+                    done()
+                })
             })
+        })
+    })
+    
+    describe("Predict matchig algorithm",() => {
+        test("predictMatching()", async() => {
+            const result = await predictMatching(user1.username, user2.username)
+            console.log(result)
         })
     })
 })
 
-describe("Predict matchig algorithm",() => {
-    test("predictMatching()", async() => {
-        const result = await predictMatching(user1.username, user2.username)
-        console.log(result)
-    })
-})
+
 
 afterAll(done => {
     deleteUser(user1, () => {

@@ -34,9 +34,10 @@
   ```
 
 - [/profile] route
-  - /profile (POST) - profile creation - request body:
   
-    **JWT must be provided inside Cookie header**
+  **JWT must be provided inside Cookie header**
+
+  - /profile (POST) - profile creation - request body:
 
   ```typescript
     {
@@ -53,9 +54,9 @@
     }
   ```
 
-  - /profile (GET) - returns logged user's profile
+  - /profile/edit (POST) - profile edit - request body: (same as in /profile, but here every field is optional)
 
-    **JWT must be provided inside Cookie header**
+  - /profile (GET) - returns logged user's profile
 
   - /profile/user/`<username>` (GET) - returns the profile of the user specified in the `username` param
 

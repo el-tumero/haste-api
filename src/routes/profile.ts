@@ -17,6 +17,12 @@ profile.get("/", verification, async (req:RequestWithUsername, res) => {
     res.json(data)
 })
 
+profile.post("/edit", verification, async(req:RequestWithUsername, res) => {
+    const data = await controllers.profile.edit(req.username, req.body)
+    statusHandler(data.state, res)
+    res.json(data)
+})
+
 profile.get("/user/:username", async (req, res) => {
     const data = await controllers.profile.getByUsername(req.params.username)
     statusHandler(data.state, res)
