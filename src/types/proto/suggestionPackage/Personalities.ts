@@ -2,11 +2,11 @@
 
 
 export interface Personalities {
-  'first'?: (number)[];
-  'second'?: (number)[];
+  'sender'?: (number)[];
+  'others'?: (number)[];
 }
 
 export interface Personalities__Output {
-  'first': (number)[];
-  'second': (number)[];
+  'sender': (number)[];
+  'others': (number)[];
 }

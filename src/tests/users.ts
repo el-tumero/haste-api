@@ -22,7 +22,7 @@ const profile1:ProfileInput = {
     photos: ["base64photo1, base64photo2"],
     interests: ["testing apis"],
     socials: ["@test"],
-    bio: "Testing in progress...",
+    bio: "Testing in progress...1",
     personality: Array(10).fill(0).map(value => value = Math.floor(Math.random() * 101))
 }
 
@@ -46,8 +46,32 @@ const profile2:ProfileInput = {
     photos: ["base64photo1, base64photo2"],
     interests: ["testing apis & more"],
     socials: ["@tset"],
-    bio: "Testing in progress...",
+    bio: "Testing in progress...2",
     personality: Array(10).fill(0).map(value => value = Math.floor(Math.random() * 101))
 }
 
-export default { users: [user1, user2], profiles: [profile1, profile2]}
+const user3:UserTest = {
+    username: "testtt2",
+    password: "12345678",
+    jwt: "",
+    uid: uuidv4()
+}
+
+const profile3:ProfileInput = {
+    firstName: "Test2",
+    birthDate: new Date("1999-12-14"),
+    location: [
+        21.045757,
+        52.147581
+    ],
+    sex: "male",
+    target: "friendships",
+    intimacy: "yes",
+    photos: ["base64photo1, base64photo2"],
+    interests: ["testing apis & more"],
+    socials: ["@tset"],
+    bio: "Testing in progress...3",
+    personality: Array(10).fill(0).map(value => value = Math.floor(Math.random() * 101))
+}
+
+export default { users: [user1, user2, user3], profiles: [profile1, profile2, profile3]}

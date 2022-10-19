@@ -6,6 +6,8 @@ import Joi from "joi";
 import ProfileCreation from "../types/ProfileCreation";
 import ProfileBase from "../types/ProfileBase";
 import ProfileEdit from "../types/ProfileEdit";
+import { predictMatching } from "./relation";
+import { Types } from "mongoose";
 
 async function create(username:string, profileData:ProfileInput){
 
@@ -111,6 +113,84 @@ async function getByLocation(username: string, radius: string) {
      
 }
 
+async function getBySuggestion(username:string, radius:string){
+    if(!radius || parseFloat(radius) === NaN || parseFloat(radius) < 0) return formatResponse("error", "Given radius is invalid!")
+
+    try {
+        const user = await User.findOne({username}).populate<{profile: ProfileCreation & {_id:Types.ObjectId}}>({
+            path: "profile",
+        })
+        .select("profile -_id")
+
+        if(user.profile){
+
+            const profile = user.profile
+            const data = await Profile.find({location: {
+                $near: {
+                  $maxDistance: parseFloat(radius),
+                  $geometry: {type: "Point", coordinates: profile.location.coordinates}
+                }
+            }})
+            .select("-location -__v")
+
+            const senderPersonality = user.profile.personality
+
+            // const sender = data.find(obj => )
+
+            console.log(user.profile._id)
+
+            const others = data.filter(obj => !obj._id.equals(user.profile._id))
+
+            const othersPersonalities = others.map(obj => obj.personality)
+
+            // console.log(user.profile)
+            console.log(others)
+            console.log(othersPersonalities)
+            console.log(senderPersonality)
+
+            const predictions = await predictMatching(senderPersonality, othersPersonalities)
+
+            // delete this any types!!!
+
+            const orderedProfiles:any = {}
+
+            for(let i=0; i<predictions.length; i++){
+                orderedProfiles[predictions[i]] = others[i]
+            }
+
+            predictions.sort((a, b) => b - a)
+
+            const result:any = []
+
+            predictions.forEach(prediction => {
+                result.push(orderedProfiles[prediction])
+            })
+
+
+            console.log(others)
+            console.log(result)
+
+            // console.log(orderedProfiles)
+            // console.log(predictions)
+
+            return formatResponse("done", "Profiles ordered")
+        }
+
+        return formatResponse("error", "Profile not created!")
+        
+    } catch (error) {
+        return formatResponse("notfound", "User not found!")
+    }
+
+    // const suggested = await predictMatching(username, r)
+
+
+
+
+
+
+}
+
 const editProfileSchema = Joi.object<ProfileEdit, true, ProfileEdit>({
     firstName: Joi.string().alphanum().min(2).max(30),
     birthDate: Joi.date(),
@@ -143,5 +223,6 @@ export default {
     create,
     edit,
     getByUsername,
-    getByLocation
+    getByLocation,
+    getBySuggestion
 }

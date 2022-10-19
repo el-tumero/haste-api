@@ -9,7 +9,8 @@
     "pm2": "NODE_ENV=production pm2 start ./dist/index.js",
     "test": "jest -i",
     "build": "tsc",
-    "dev": "NODE_ENV=development nodemon ./src/index.ts"
+    "dev": "NODE_ENV=development nodemon ./src/index.ts",
+    "prototypes": "yarn proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=src/types/proto src/proto/*.proto"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",

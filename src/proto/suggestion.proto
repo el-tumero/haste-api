@@ -3,14 +3,14 @@ syntax = "proto3";
 package suggestionPackage;
 
 service Suggestion {
-    rpc getChance(Personalities) returns (Reply);
+    rpc getChances(Personalities) returns (Reply);
 }
 
 message Reply {
-    float chance = 1;
+    repeated float chances = 1;
 }
 
 message Personalities {
-    repeated int32 first = 1;
-    repeated int32 second = 2;
+    repeated int32 sender = 1;
+    repeated int32 others = 2;
 }

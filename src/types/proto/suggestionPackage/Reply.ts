@@ -2,9 +2,9 @@
 
 
 export interface Reply {
-  'chance'?: (number | string);
+  'chances'?: (number | string)[];
 }
 
 export interface Reply__Output {
-  'chance': (number);
+  'chances': (number)[];
 }
