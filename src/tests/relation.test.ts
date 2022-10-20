@@ -28,9 +28,9 @@ beforeAll(done => {
 //describe.skip("skip", () => {
     describe("Init", () => {
         test("It should create three new users with profiles", async() => {
-            const {jwt: jwt1} = await createUser(user1, profile1)
-            const {jwt: jwt2} = await createUser(user2, profile2)
-            const {jwt: jwt3} = await createUser(user3, profile3)
+            const jwt1 = await createUser(user1, profile1)
+            const jwt2 = await createUser(user2, profile2)
+            const jwt3 = await createUser(user3, profile3)
             
             user1.jwt = jwt1
             user2.jwt = jwt2
@@ -61,13 +61,9 @@ beforeAll(done => {
 
 
 
-afterAll(done => {
-    deleteUser(user1, () => { // callback hell
-        deleteUser(user2, () => {
-            deleteUser(user3, () => {
-                mongoose.connection.close()
-                done()
-            })
-        })
-    })
+afterAll(async() => {
+    await deleteUser(user1)
+    await deleteUser(user2)
+    await deleteUser(user3)
+    mongoose.connection.close()
 })

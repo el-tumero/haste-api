@@ -5,6 +5,5 @@ import UserBase from "./UserBase";
  */
 export default interface UserLogin extends UserBase{
     password: string,
-    token: string,
     uid: string
 }

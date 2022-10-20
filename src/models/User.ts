@@ -1,12 +1,12 @@
 import { model, Schema, Types } from "mongoose";
 
 const schema = new Schema({
-    username: {
+    phone: {
         type: String,
         unique: true,
         required: true
     },
-    secret: {
+    password: {
         type: String,
         required: true
     },

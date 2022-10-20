@@ -8,6 +8,7 @@ import deleteUser from "./deleteUser"
 import testUsers from "./users"
 
 
+
 beforeAll(done => {
     mongoose.connect(process.env.MONGO_URI as string)
     .then(() => done())
@@ -23,14 +24,14 @@ const profile2 = testUsers.profiles[1]
 // Creating users
   
 describe("Init", () => {
-    test("It should create two new users with profiles", done => {
-        createUser(user1, profile1).then(obj1 => {
-            user1.jwt = obj1.jwt
-            createUser(user2, profile2).then(obj2 => {
-                user2.jwt = obj2.jwt
-                done()
-            })
-        })
+    test("It should create two new users with profiles", async() => {
+
+        const jwt1 = await createUser(user1, profile1)
+        user1.jwt = jwt1
+
+        const jwt2 = await createUser(user2, profile2)
+        user2.jwt = jwt2
+
     })
 })
 
@@ -56,12 +57,11 @@ describe("Location range test", () => {
     })
 })
 
-afterAll(done => {
-    deleteUser(user1, () => {
-        deleteUser(user2, () => {
-            mongoose.connection.close()
-            done()
-        })
-    })
+afterAll(async() => {
+
+    await deleteUser(user1)
+    await deleteUser(user2)
+    
+    mongoose.connection.close()
 })
 

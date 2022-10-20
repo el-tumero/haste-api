@@ -9,14 +9,14 @@ import ProfileEdit from "../types/ProfileEdit";
 import { predictMatching } from "./relation";
 import { Types } from "mongoose";
 
-async function create(username:string, profileData:ProfileInput){
+async function create(id:string, profileData:ProfileInput){
 
     try {
         await createProfileSchema.validateAsync(profileData)
-        const user = await User.findOne({username, profile: {$exists: false}})
+        const user = await User.findOne({_id: id, profile: {$exists: false}})
         if(user){
             const profile = await Profile.create({...profileData, location: {type: "Point", coordinates: profileData.location}})
-            await User.updateOne({username}, {profile})
+            await User.updateOne({_id: id}, {profile})
             return formatResponse("done", "Profile successfully created!")
         }
         return formatResponse("conflict", "User already has a profile!")
@@ -30,10 +30,10 @@ async function create(username:string, profileData:ProfileInput){
 
 }
 
-// remove?
-async function getByUsername(username:string){
+// to rebuild?
+async function getById(id:string){
     try {
-        const data = await User.findOne({username}).populate({
+        const data = await User.findById(id).populate({
             path: "profile",
             select: "-_id -__v -location"
         })
@@ -50,12 +50,12 @@ async function getByUsername(username:string){
     }
 }
 
-async function edit(username:string, newValues:ProfileEdit){
+async function edit(id:string, newValues:ProfileEdit){
     try {
 
         await editProfileSchema.validateAsync(newValues)
 
-        const data = await User.findOne({username})
+        const data = await User.findOne({_id: id})
         const profileId = data.profile
 
         if(profileId){
@@ -79,12 +79,12 @@ async function edit(username:string, newValues:ProfileEdit){
 }
 
 // finds profiles near user in specified radius
-async function getByLocation(username: string, radius: string) {
+async function getByLocation(id: string, radius: string) {
 
     if(!radius || parseFloat(radius) === NaN || parseFloat(radius) < 0) return formatResponse("error", "Given radius is invalid!")
 
     try {
-        const user = await User.findOne({username}).populate<{profile: ProfileCreation}>({
+        const user = await User.findById(id).populate<{profile: ProfileCreation}>({
             path: "profile",
             select: "location -_id"
         })
@@ -113,11 +113,11 @@ async function getByLocation(username: string, radius: string) {
      
 }
 
-async function getBySuggestion(username:string, radius:string){
+async function getBySuggestion(id:string, radius:string){
     if(!radius || parseFloat(radius) === NaN || parseFloat(radius) < 0) return formatResponse("error", "Given radius is invalid!")
 
     try {
-        const user = await User.findOne({username}).populate<{profile: ProfileCreation & {_id:Types.ObjectId}}>({
+        const user = await User.findById(id).populate<{profile: ProfileCreation & {_id:Types.ObjectId}}>({
             path: "profile",
         })
         .select("profile -_id")
@@ -135,18 +135,18 @@ async function getBySuggestion(username:string, radius:string){
 
             const senderPersonality = user.profile.personality
 
-            // const sender = data.find(obj => )
 
-            console.log(user.profile._id)
+
+            // console.log(user.profile._id)
 
             const others = data.filter(obj => !obj._id.equals(user.profile._id))
 
             const othersPersonalities = others.map(obj => obj.personality)
 
             // console.log(user.profile)
-            console.log(others)
-            console.log(othersPersonalities)
-            console.log(senderPersonality)
+            // console.log(others)
+            // console.log(othersPersonalities)
+            // console.log(senderPersonality)
 
             const predictions = await predictMatching(senderPersonality, othersPersonalities)
 
@@ -167,13 +167,13 @@ async function getBySuggestion(username:string, radius:string){
             })
 
 
-            console.log(others)
-            console.log(result)
+            // console.log(others)
+            // console.log(result)
 
             // console.log(orderedProfiles)
             // console.log(predictions)
 
-            return formatResponse("done", "Profiles ordered")
+            return formatResponse("done", "Profiles ordered", {profiles: result})
         }
 
         return formatResponse("error", "Profile not created!")
@@ -181,13 +181,6 @@ async function getBySuggestion(username:string, radius:string){
     } catch (error) {
         return formatResponse("notfound", "User not found!")
     }
-
-    // const suggested = await predictMatching(username, r)
-
-
-
-
-
 
 }
 
@@ -222,7 +215,7 @@ const createProfileSchema = Joi.object<ProfileInput, true, ProfileInput>({
 export default {
     create,
     edit,
-    getByUsername,
+    getById,
     getByLocation,
     getBySuggestion
 }

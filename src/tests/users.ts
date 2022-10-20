@@ -3,7 +3,7 @@ import {v4 as uuidv4} from "uuid"
 import ProfileInput from "../types/ProfileInput"
 
 const user1:UserTest = {
-    username: "testtt",
+    phone: "123123123",
     password: "12345678",
     jwt: "",
     uid: uuidv4()
@@ -27,7 +27,7 @@ const profile1:ProfileInput = {
 }
 
 const user2:UserTest = {
-    username: "tttset",
+    phone: "234234234",
     password: "12345678",
     jwt: "",
     uid: uuidv4()
@@ -51,7 +51,7 @@ const profile2:ProfileInput = {
 }
 
 const user3:UserTest = {
-    username: "testtt2",
+    phone: "345345345",
     password: "12345678",
     jwt: "",
     uid: uuidv4()

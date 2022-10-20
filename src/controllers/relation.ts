@@ -24,23 +24,23 @@ const grpcRequest = (personalities:Personalities) => new Promise<number[]>((reso
     })
 })
 
-async function predictMatchingDebug(usernameSender:string, usernames:string[]){
-    const data = await User.find({username: {$in: [usernameSender, ...usernames]}}).populate<{profile: ProfileCreation}>("profile", "personality -_id").select("profile username -_id")
+// async function predictMatchingDebug(usernameSender:string, usernames:string[]){
+//     const data = await User.find({username: {$in: [usernameSender, ...usernames]}}).populate<{profile: ProfileCreation}>("profile", "personality -_id").select("profile username -_id")
     
-    const sender = data.find(obj => obj.username === usernameSender)
-    const other = data.filter(obj => obj.username !== usernameSender)
+//     const sender = data.find(obj => obj.username === usernameSender)
+//     const other = data.filter(obj => obj.username !== usernameSender)
     
-    const personalities:Personalities = {
-        sender: sender.profile.personality,
-        others: [].concat(...other.map(obj => obj.profile.personality))
-    }
+//     const personalities:Personalities = {
+//         sender: sender.profile.personality,
+//         others: [].concat(...other.map(obj => obj.profile.personality))
+//     }
 
-    // sending payload via grpc client to python tensorflow server
-    const response = await grpcRequest(personalities)
+//     // sending payload via grpc client to python tensorflow server
+//     const response = await grpcRequest(personalities)
     
-    return response
+//     return response
 
-}
+// }
 
 async function predictMatching(senderPersonality:number[], otherPersonalities:number[][]){
 

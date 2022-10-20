@@ -1,41 +1,27 @@
 import User from "../models/User";
 import Joi from "joi"
 import UserCreation from "../types/UserCreation";
-import { authenticator } from "otplib";
-import { AES, enc } from 'crypto-js'
+import { SHA256 } from 'crypto-js'
 import UserLogin from "../types/UserLogin";
 import jwt from 'jsonwebtoken'
 import formatResponse from './formatResponse'
 import { ResponseMessageExtended } from "../types/ResponseMessage";
-import Ban from "../models/Ban";
-import { checkIfUidIsBanned, giveBan, giveUidBan } from "./ban";
+
 
 async function login(user:UserLogin):Promise<ResponseMessageExtended>{
     try {
+
+
+
         await loginSchema.validateAsync(user)
 
-        const isUidBanned = await checkIfUidIsBanned(user.uid)
+        const foundUser = await User.findOne({phone: user.phone})
 
-        if(isUidBanned) {
-            await giveBan(user.username)
-        }
-
-        const foundUser = await User.findOne({username: user.username})
-
-        // if(foundUser.uid.includes)
-        
-
-        if(foundUser.banned) return formatResponse("conflict", "Your account is permanently banned!")
-        if(foundUser.uid.length >= 3) return formatResponse("conflict", "You cannot log in on more than 3 devices!") 
-        if(!foundUser.uid.includes(user.uid)) await User.updateOne({username: user.username}, {$push: {uid: user.uid}})
-
-        const bytes = AES.decrypt(foundUser.secret, user.password)
-        const secret = bytes.toString(enc.Utf8)
-
-        if(user.token === authenticator.generate(secret)){
-            const sessionToken = jwt.sign({username: user.username}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
+        if(SHA256(user.password).toString() === foundUser.password){
+            const sessionToken = jwt.sign({id: foundUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
             return formatResponse("done", "Logged in!", {sessionToken})
         }
+
         return formatResponse("unauthorized", "Not valid credentials!")
 
     } catch (err) {
@@ -49,17 +35,19 @@ async function create(user:UserCreation):Promise<ResponseMessageExtended>{
 
         await createSchema.validateAsync(user)
 
-        const {_id} = await User.create({
-          username: user.username,
-          secret: user.secret
+        const password = SHA256(user.password).toString()
+
+        await User.create({
+          phone: user.phone,
+          password
         })
-        
-        return formatResponse("done", "Succesfully created a user!", {id: _id.toString()})
+
+        return formatResponse("done", "Succesfully created a user!")
        
     }catch(err){
 
         if(err.name === "MongoServerError" && err.code === 11000 ){
-            return formatResponse("conflict", "User with given username already exists!")
+            return formatResponse("conflict", "User with given phone number already exists!")
         }
 
         if(err.name === "ValidationError") {
@@ -71,14 +59,13 @@ async function create(user:UserCreation):Promise<ResponseMessageExtended>{
 }
 
 const createSchema = Joi.object<UserCreation, true, UserCreation>({
-    username: Joi.string().alphanum().min(3).max(20).required(),
-    secret: Joi.string().required()
+    phone: Joi.string().length(9).required(),
+    password: Joi.string().min(3).required()
 })
 
 const loginSchema = Joi.object<UserLogin, true, UserLogin>({
-    username: Joi.string().alphanum().min(3).max(20).required(),
-    password: Joi.string().min(8).required(),
-    token: Joi.string().alphanum().length(6).required(),
+    phone: Joi.string().length(9).required(),
+    password: Joi.string().min(3).required(),
     uid: Joi.string().required()
 })
 

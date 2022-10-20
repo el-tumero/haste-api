@@ -1,51 +1,51 @@
 import { Router } from "express";
 import controllers from "../controllers/controllers";
 import statusHandler from "./utils/statusHandler";
-import verification, {RequestWithUsername} from "../middlewares/verification";
+import verification, {RequestWithId} from "../middlewares/verification";
 
 const profile = Router()
 
-profile.post("/", verification, async (req:RequestWithUsername, res) => {
-    const data = await controllers.profile.create(req.username, req.body)
+profile.post("/", verification, async (req:RequestWithId, res) => {
+    const data = await controllers.profile.create(req.id, req.body)
     statusHandler(data.state, res)
     res.json(data) 
 })
 
-profile.get("/", verification, async (req:RequestWithUsername, res) => {
-    const data = await controllers.profile.getByUsername(req.username)
+profile.get("/", verification, async (req:RequestWithId, res) => {
+    const data = await controllers.profile.getById(req.id)
     statusHandler(data.state, res)
     res.json(data)
 })
 
-profile.post("/edit", verification, async(req:RequestWithUsername, res) => {
-    const data = await controllers.profile.edit(req.username, req.body)
+profile.post("/edit", verification, async(req:RequestWithId, res) => {
+    const data = await controllers.profile.edit(req.id, req.body)
     statusHandler(data.state, res)
     res.json(data)
 })
 
-profile.get("/user/:username", async (req, res) => {
-    const data = await controllers.profile.getByUsername(req.params.username)
-    statusHandler(data.state, res)
-    res.json(data)
-})
+// profile.get("/user/:username", async (req, res) => {
+//     const data = await controllers.profile.getByUsername(req.params.username)
+//     statusHandler(data.state, res)
+//     res.json(data)
+// })
 
-profile.get("/nearby", verification, async (req:RequestWithUsername, res) => {
+profile.get("/nearby", verification, async (req:RequestWithId, res) => {
     const radius = req.query.radius as string
-    const data = await controllers.profile.getByLocation(req.username, radius)
+    const data = await controllers.profile.getByLocation(req.id, radius)
     statusHandler(data.state, res)
     res.json(data)
 })
 
-profile.get("/suggestion", verification, async (req:RequestWithUsername, res) => {
+profile.get("/suggestion", verification, async (req:RequestWithId, res) => {
     const radius = req.query.radius as string
-    const data = await controllers.profile.getBySuggestion(req.username, radius)
+    const data = await controllers.profile.getBySuggestion(req.id, radius)
     statusHandler(data.state, res)
     res.json(data)
 })
 
-profile.get("/test", verification, async (req, res) => {
-    res.status(200).json({"status": "done"})
-})
+// profile.get("/test", verification, async (req, res) => {
+//     res.status(200).json({"status": "done"})
+// })
 
 
 export default profile
