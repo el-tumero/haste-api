@@ -11,7 +11,7 @@
 
   ```typescript
     {
-        username: string,
+        phone: string,
         password: string
     }
   ```
@@ -25,7 +25,7 @@
 
   ```typescript
     {
-        username: string,
+        phone: string,
         password: string,
         uid: string
     }
