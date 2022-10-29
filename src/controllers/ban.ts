@@ -3,9 +3,9 @@ import Ban from "../models/Ban";
 import User from "../models/User";
 // import formatResponse from "./formatResponse";
 
-async function giveBan(username:string){
+async function giveBan(phoneNumber:number){
     try {
-        const user = await User.findOneAndUpdate({username}, {banned: true})
+        const user = await User.findOneAndUpdate({phoneNumber}, {banned: true})
         const docs = user.uid.map((value) => ({"uid": value}))
         await Ban.insertMany(docs)
         return "user banned"  
@@ -14,9 +14,9 @@ async function giveBan(username:string){
     }
 }
 
-async function unban(username:string){
+async function unban(phoneNumber:number){
     try {
-        const user = await User.findOneAndUpdate({username}, {banned: false})
+        const user = await User.findOneAndUpdate({phoneNumber}, {banned: false})
         // const docs = user.uid.map((value) => ({"uid": value}))
         // console.log(docs)
         await Ban.deleteMany({

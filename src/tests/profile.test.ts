@@ -24,7 +24,7 @@ const profile = testUsers.profiles[0]
 
 describe("Init", () => {
   test("It should create new user", done => {
-      createUser(user).then(({jwt}) => {
+      createUser(user).then(jwt => {
           user.jwt = jwt
           done()
       })
@@ -80,37 +80,6 @@ describe("Test the /profile (POST) path", () => {
   })
 })
 
-describe("Test the /profile/user/:username (GET) path", () => {
-  test("It should returns a user profile", done => {
-    request(app)
-    .get("/profile/user/" + user.username)
-    .then(response => {
-      expect(response.body.profile.firstName).toEqual("Test")
-      expect(response.statusCode).toBe(200);
-      done()
-    })
-  })
-
-  test("It should returns an error (profile does not exist)", done => {
-    request(app)
-    .get("/profile/user/" + "test")
-    .then(response => {
-      expect(response.body.message).toEqual("Profile not found!")
-      expect(response.statusCode).toBe(404);
-      done()
-    })
-  })
-
-  test("It should returns an error", done => {
-    request(app)
-    .get("/profile/user/" + "404")
-    .then(response => {
-      expect(response.body.message).toEqual("User not found!")
-      expect(response.statusCode).toBe(404);
-      done()
-    })
-  })
-})
 
 describe("Test the /profile (GET) path", () => {
   test("It should returns a user profile", done => {
@@ -133,28 +102,6 @@ describe("Test the /profile (GET) path", () => {
     })
   })
 })
-
-describe("Test the /profile/test (GET) path", () => {
-  test("It should returns 200", done => {
-    request(app)
-    .get("/profile/test")
-    .set("Cookie", [user.jwt])
-    .then(response => {
-      expect(response.statusCode).toBe(200);
-      done()
-    })
-  })
-
-  test("It should returns 401", done => {
-    request(app)
-    .get("/profile/test")
-    .then(response => {
-      expect(response.statusCode).toBe(401);
-      done()
-    })
-  })
-})
-
 
 describe("Test the /profile/nearby (GET) path", () => {
   test("It should returns profiles of nearby users (5 km radius)", done => {
@@ -191,8 +138,32 @@ describe("Test the /profile/nearby (GET) path", () => {
  
 })
 
+describe("Test the /profile/edit (GET) path", () => {
+  test("It should change firstName", done => {
+    request(app)
+    .post("/profile/edit")
+    .set("Cookie", [user.jwt])
+    .send({firstName: "Jack"})
+    .then(response => {
+      expect(response.statusCode).toBe(200);
+      done()
+    })
+  })
+
+  test("It should returns Jack as firstName", done => {
+    request(app)
+    .get("/profile")
+    .set("Cookie", [user.jwt])
+    .then(response => {
+      expect(response.body.profile.firstName).toEqual("Jack")
+      expect(response.statusCode).toBe(200);
+      done()
+    })
+  })
+})
+
 afterAll(done => {
-  User.findOneAndDelete({username: user.username}, async(err:Error, doc:any) => {
+  User.findOneAndDelete({phone: user.phone}, async(err:Error, doc:any) => {
     if(doc){
       await Profile.deleteOne({_id: doc.profile})
     }

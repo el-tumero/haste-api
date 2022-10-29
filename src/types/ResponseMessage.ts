@@ -1,5 +1,5 @@
-import ProfileBase from "./ProfileBase"
-import ProfileCreation from "./ProfileCreation"
+import ProfileBase from "./Profile/IProfileBase"
+import ProfileCreation from "./Profile/IProfileCreation"
 
 export type ResponseState = "done" | "error" | "notfound" | "unauthorized" | "conflict"
 
@@ -7,8 +7,8 @@ export interface ResponseExt {
     sessionToken?:string
     id?:string
     username?:string
-    profile?: ProfileCreation
-    profiles?: ProfileCreation[]
+    profile?: ProfileBase
+    profiles?: ProfileBase[]
 }
 
 export interface ResponseMessage{

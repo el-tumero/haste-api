@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package suggestionPackage;
+
+service Suggestion {
+    rpc getChances(Personalities) returns (Reply);
+}
+
+message Reply {
+    repeated float chances = 1;
+}
+
+message Personalities {
+    repeated int32 sender = 1;
+    repeated int32 others = 2;
+}
