@@ -16,7 +16,7 @@ const schema = new Schema<IUserCreation>({
         required: true
     },
     uid: {
-        type: [String]
+        type: [String],
     },
     profile: {
         type: Types.ObjectId,

@@ -6,6 +6,7 @@ import formatResponse from './formatResponse'
 import { ResponseMessageExtended } from "../types/ResponseMessage";
 import IUserLoginClient from "../types/User/IUserLoginClient";
 import IUserCreationClient from "../types/User/IUserCreationClient";
+import tfa from "./tfa";
 
 
 async function login(user:IUserLoginClient):Promise<ResponseMessageExtended>{
@@ -14,6 +15,8 @@ async function login(user:IUserLoginClient):Promise<ResponseMessageExtended>{
         await loginSchema.validateAsync(user)
 
         const foundUser = await User.findOne({phone: user.phone})
+
+        if(!foundUser.activated) return formatResponse("unauthorized", "The account has not been activated!")
 
         if(SHA256(user.password).toString() === foundUser.password){
             const sessionToken = jwt.sign({id: foundUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
@@ -40,6 +43,8 @@ async function create(user:IUserCreationClient):Promise<ResponseMessageExtended>
           password,
           activated: false
         })
+
+        tfa.generateCode(user.phone)
 
         return formatResponse("done", "Succesfully created a user!")
        
@@ -70,5 +75,5 @@ const loginSchema = Joi.object<IUserLoginClient, true, IUserLoginClient>({
 
 export default {
     create,
-    login
+    login,
 }

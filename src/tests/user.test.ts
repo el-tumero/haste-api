@@ -11,7 +11,6 @@ const user = {
   uid: uuid4()
 }
 
-
 beforeAll(async() => {
   try {
     await mongoose.connect(process.env.MONGO_URI as string)
@@ -26,7 +25,6 @@ describe("Test the /user (POST) path (creating account)", () => {
   test("It should creates a new user", async ()=> {
     const {phone, password} = user
     const response = await request(app).post("/user").send({phone, password})
-    console.log(response.body)
     expect(response.statusCode).toBe(200)
   })
 
@@ -40,6 +38,37 @@ describe("Test the /user (POST) path (creating account)", () => {
     const response = await request(app).post("/user").send({phone: 123, password: "12"})
     expect(response.statusCode).toBe(409)
   })
+
+})
+
+// /user/activate & /user/code
+
+describe("Test the /user/activate (POST) & /user/code (GET) paths", () => {
+
+  let code = ""
+
+  test("It should response with code", async() => {
+    const response = await request(app).get("/user/code").query({phone: user.phone})
+    expect(response.statusCode).toBe(200)
+    expect(response.body.message).toHaveLength(4)
+    console.log(response.body)
+    code = response.body.message
+  })
+
+  test("It should response with error", async() => {
+    const response = await request(app).get("/user/code").query({phone: 123123123})
+    expect(response.statusCode).toBe(404)
+    console.log(response.body)
+  })
+
+
+  test("It should activate account", async() => {
+    const response = await request(app).post("/user/activate").send({phone:user.phone, code})
+    console.log(response.body)
+    expect(response.statusCode).toBe(200)
+  })
+
+
 
 })
 
@@ -75,7 +104,6 @@ describe("Test the /user/login (POST) path", () => {
  
     })
 })
-
 
 
 afterAll(done => {
