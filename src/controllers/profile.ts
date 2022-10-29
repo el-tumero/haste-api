@@ -1,16 +1,19 @@
 import Profile from "../models/Profile";
 import User from "../models/User";
 import formatResponse from "./formatResponse";
-import ProfileInput from "../types/ProfileInput";
 import Joi from "joi";
-import ProfileCreation from "../types/ProfileCreation";
-import ProfileBase from "../types/ProfileBase";
-import ProfileEdit from "../types/ProfileEdit";
+
+import IProfileCreation from "../types/Profile/IProfileCreation";
+import IProfileBase from "../types/Profile/IProfileBase";
+import IProfileCreationClient from "../types/Profile/IProfileCreationClient";
+import IProfileEditClient from "../types/Profile/IProfileEditClient";
+
+
 import { predictMatching } from "./relation";
 import { Types } from "mongoose";
 
-async function create(id:string, profileData:ProfileInput){
 
+async function create(id:string, profileData:IProfileCreationClient){
     try {
         await createProfileSchema.validateAsync(profileData)
         const user = await User.findOne({_id: id, profile: {$exists: false}})
@@ -27,7 +30,6 @@ async function create(id:string, profileData:ProfileInput){
 
         return formatResponse("error", "Something went wrong!") 
     }
-
 }
 
 // to rebuild?
@@ -39,7 +41,7 @@ async function getById(id:string){
         })
         .select("profile -_id")
 
-        const profile = data.profile as ProfileBase // false convertion
+        const profile = data.profile as IProfileBase // false convertion
         
         if(profile) return formatResponse("done", "User's profile data", {profile})
 
@@ -50,9 +52,8 @@ async function getById(id:string){
     }
 }
 
-async function edit(id:string, newValues:ProfileEdit){
+async function edit(id:string, newValues:IProfileEditClient){
     try {
-
         await editProfileSchema.validateAsync(newValues)
 
         const data = await User.findOne({_id: id})
@@ -84,7 +85,7 @@ async function getByLocation(id: string, radius: string) {
     if(!radius || parseFloat(radius) === NaN || parseFloat(radius) < 0) return formatResponse("error", "Given radius is invalid!")
 
     try {
-        const user = await User.findById(id).populate<{profile: ProfileCreation}>({
+        const user = await User.findById(id).populate<{profile: IProfileCreation}>({
             path: "profile",
             select: "location -_id"
         })
@@ -100,9 +101,9 @@ async function getByLocation(id: string, radius: string) {
             }})
             .select("-_id -location -__v -personality")
 
-            const profiles = data as ProfileBase[] // create profile output type
+            const profiles = data as IProfileBase[] // create profile output type
 
-            return formatResponse("done", "Profiles found!", {profiles}) // ProfileBase[]
+            return formatResponse("done", "Profiles found!", {profiles}) 
         }
 
         return formatResponse("error", "Profile not created!")
@@ -117,7 +118,7 @@ async function getBySuggestion(id:string, radius:string){
     if(!radius || parseFloat(radius) === NaN || parseFloat(radius) < 0) return formatResponse("error", "Given radius is invalid!")
 
     try {
-        const user = await User.findById(id).populate<{profile: ProfileCreation & {_id:Types.ObjectId}}>({
+        const user = await User.findById(id).populate<{profile: IProfileCreation & {_id:Types.ObjectId}}>({
             path: "profile",
         })
         .select("profile -_id")
@@ -184,28 +185,28 @@ async function getBySuggestion(id:string, radius:string){
 
 }
 
-const editProfileSchema = Joi.object<ProfileEdit, true, ProfileEdit>({
+const editProfileSchema = Joi.object<IProfileEditClient, true, IProfileEditClient>({
     firstName: Joi.string().alphanum().min(2).max(30),
     birthDate: Joi.date(),
-    sex: Joi.string(),
-    target: Joi.string().alphanum(),
-    intimacy: Joi.string().alphanum(),
+    gender: Joi.string(),
+    targetGender: Joi.string().alphanum(),
+    lookingFor: Joi.string().alphanum(),
     photos: Joi.array().items(Joi.string()),
     interests: Joi.array().items(Joi.string().max(25)),
-    socials: Joi.array().items(Joi.string().max(35)),
+    socialsList: Joi.array().items(Joi.string().max(35)),
     bio: Joi.string().max(255),
 })
 
-const createProfileSchema = Joi.object<ProfileInput, true, ProfileInput>({
+const createProfileSchema = Joi.object<IProfileCreationClient, true, IProfileCreationClient>({
     firstName: Joi.string().alphanum().min(2).max(30).required(),
     location: Joi.array().items(Joi.number()).length(2).required(),
     birthDate: Joi.date().required(),
-    sex: Joi.string().required(),
-    target: Joi.string().alphanum().required(),
-    intimacy: Joi.string().alphanum().required(),
+    gender: Joi.string().required(),
+    targetGender: Joi.string().alphanum().required(),
+    lookingFor: Joi.string().alphanum().required(),
     photos: Joi.array().items(Joi.string()).required(),
     interests: Joi.array().items(Joi.string().max(25)).required(),
-    socials: Joi.array().items(Joi.string().max(35)).required(),
+    socialsList: Joi.array().items(Joi.string().max(35)).required(),
     bio: Joi.string().max(255).required(),
     personality: Joi.array().items(Joi.number().min(0).max(100).precision(0)).length(10).required()
 })

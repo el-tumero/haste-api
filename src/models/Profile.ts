@@ -1,8 +1,7 @@
 import { model, Schema } from "mongoose";
-import ProfileCreation from "../types/ProfileCreation";
-import ProfileBase from "../types/ProfileBase";
+import IProfileCreation from "../types/Profile/IProfileCreation";
 import pointSchema from "./schemas/pointSchema";
-const schema = new Schema<ProfileCreation>({
+const schema = new Schema<IProfileCreation>({
     firstName: {
         type: String,
         required: true
@@ -15,15 +14,15 @@ const schema = new Schema<ProfileCreation>({
         type: pointSchema,
         required: true
     },
-    sex: {
+    gender: {
         type: String,
         required: true
     },
-    target: {
+    targetGender: {
         type: String,
         required: true
     },
-    intimacy: {
+    lookingFor: {
         type: String,
         required: true
     },
@@ -35,7 +34,7 @@ const schema = new Schema<ProfileCreation>({
         type: [String],
         required: true
     },
-    socials: {
+    socialsList: {
         type: [String],
         required: true
     },

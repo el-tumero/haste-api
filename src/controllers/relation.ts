@@ -1,5 +1,5 @@
 import User from "../models/User"
-import ProfileCreation from "../types/ProfileCreation"
+import ProfileCreation from "../types/Profile/IProfileCreation"
 import * as grcp from "@grpc/grpc-js"
 import { loadSync } from "@grpc/proto-loader"
 import { ProtoGrpcType } from "../types/proto/suggestion"

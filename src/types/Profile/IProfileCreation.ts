@@ -1,6 +1,5 @@
-import ProfileBase from "./ProfileBase";
-
-export default interface ProfileCreation extends ProfileBase {
+import IProfileBase from "./IProfileBase";
+export default interface IProfileCreation extends IProfileBase {
     location: {
         type: "Point",
         coordinates: [number, number]

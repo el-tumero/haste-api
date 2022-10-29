@@ -2,7 +2,6 @@ import request from "supertest"
 import app from "../app"
 import {describe, expect, test, afterAll, beforeAll} from '@jest/globals'
 import mongoose from "mongoose"
-import ProfileInput from "../types/ProfileInput"
 import {createUser, UserTest} from "./createUser"
 import deleteUser from "./deleteUser"
 import testUsers from "./users"

@@ -1,17 +1,15 @@
 import User from "../models/User";
 import Joi from "joi"
-import UserCreation from "../types/UserCreation";
 import { SHA256 } from 'crypto-js'
-import UserLogin from "../types/UserLogin";
 import jwt from 'jsonwebtoken'
 import formatResponse from './formatResponse'
 import { ResponseMessageExtended } from "../types/ResponseMessage";
+import IUserLoginClient from "../types/User/IUserLoginClient";
+import IUserCreationClient from "../types/User/IUserCreationClient";
 
 
-async function login(user:UserLogin):Promise<ResponseMessageExtended>{
+async function login(user:IUserLoginClient):Promise<ResponseMessageExtended>{
     try {
-
-
 
         await loginSchema.validateAsync(user)
 
@@ -30,7 +28,7 @@ async function login(user:UserLogin):Promise<ResponseMessageExtended>{
     
 }
 
-async function create(user:UserCreation):Promise<ResponseMessageExtended>{
+async function create(user:IUserCreationClient):Promise<ResponseMessageExtended>{
     try{
 
         await createSchema.validateAsync(user)
@@ -39,7 +37,8 @@ async function create(user:UserCreation):Promise<ResponseMessageExtended>{
 
         await User.create({
           phone: user.phone,
-          password
+          password,
+          activated: false
         })
 
         return formatResponse("done", "Succesfully created a user!")
@@ -58,12 +57,12 @@ async function create(user:UserCreation):Promise<ResponseMessageExtended>{
     }
 }
 
-const createSchema = Joi.object<UserCreation, true, UserCreation>({
+const createSchema = Joi.object<IUserCreationClient, true, IUserCreationClient>({
     phone: Joi.string().length(9).required(),
     password: Joi.string().min(3).required()
 })
 
-const loginSchema = Joi.object<UserLogin, true, UserLogin>({
+const loginSchema = Joi.object<IUserLoginClient, true, IUserLoginClient>({
     phone: Joi.string().length(9).required(),
     password: Joi.string().min(3).required(),
     uid: Joi.string().required()

@@ -2,7 +2,7 @@ import { AES } from "crypto-js";
 import { authenticator } from "otplib";
 import request from "supertest"
 import app from "../app"
-import ProfileInput from "../types/ProfileInput";
+import IProfileCreationClient from "../types/Profile/IProfileCreationClient";
 
 interface UserTest {
     phone: string
@@ -11,7 +11,7 @@ interface UserTest {
     uid: string
 }
 
-async function createUser(user:UserTest, profile?:ProfileInput) {
+async function createUser(user:UserTest, profile?:IProfileCreationClient) {
 
 
     // creation
