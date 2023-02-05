@@ -1,5 +1,6 @@
 import User from "../models/User"
 import formatResponse from "./formatResponse"
+import jwt from 'jsonwebtoken'
 const codesDatabase:{[key:string]: string} = {}
 
 function generateCode(phone:string){
@@ -16,6 +17,10 @@ function displayCode(phone:any){
     return formatResponse("notfound", "No code found for given number!")
 }
 
+function deleteCode(phone: string){
+    delete codesDatabase[phone]
+}
+
 async function activate(phone:string, code:string){
 
     const validator = new RegExp(/^[0-9]+$/)
@@ -25,8 +30,10 @@ async function activate(phone:string, code:string){
     try {
         if(code !== codesDatabase[phone]) return formatResponse("conflict", "Wrong auth code!")
         delete codesDatabase[phone]
-        await User.updateOne({phone}, {activated: true})
-        return formatResponse("done", "Account activated!")
+        const updatedUser = await User.findOneAndUpdate({phone}, {activated: true})
+        const sessionToken = jwt.sign({id: updatedUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
+        return formatResponse("done", "Account activated!", {sessionToken})
+        // return formatResponse("done", "Account activated!")
 
     } catch (error) {
         return formatResponse("error", "Server error")
@@ -36,6 +43,7 @@ async function activate(phone:string, code:string){
 export default {
     generateCode,
     displayCode,
+    deleteCode,
     activate
 }
 

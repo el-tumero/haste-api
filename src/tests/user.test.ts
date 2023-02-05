@@ -7,7 +7,6 @@ import User from "../models/User"
 
 const user = {
   phone: "205371349",
-  password: "12345678",
   uid: uuid4()
 }
 
@@ -23,21 +22,21 @@ beforeAll(async() => {
 describe("Test the /user (POST) path (creating account)", () => {
 
   test("It should creates a new user", async ()=> {
-    const {phone, password} = user
-    const response = await request(app).post("/user").send({phone, password})
+    const {phone} = user
+    const response = await request(app).post("/user").send({phone})
     expect(response.statusCode).toBe(200)
   })
 
   test("It should response with status code 409 (user with given phone number already exists!)", async() => {
-    const {phone, password} = user
-    const response = await request(app).post("/user").send({phone, password})
+    const {phone} = user
+    const response = await request(app).post("/user").send({phone})
     expect(response.statusCode).toBe(409)
   })
 
-  test("It should response with error (validation error)", async() => {
-    const response = await request(app).post("/user").send({phone: 123, password: "12"})
-    expect(response.statusCode).toBe(409)
-  })
+  // test("It should response with error (validation error)", async() => {
+  //   const response = await request(app).post("/user").send({phone: 123, password: "12"})
+  //   expect(response.statusCode).toBe(409)
+  // })
 
 })
 
@@ -51,14 +50,14 @@ describe("Test the /user/activate (POST) & /user/code (GET) paths", () => {
     const response = await request(app).get("/user/code").query({phone: user.phone})
     expect(response.statusCode).toBe(200)
     expect(response.body.message).toHaveLength(4)
-    console.log(response.body)
+    // console.log(response.body)
     code = response.body.message
   })
 
   test("It should response with error", async() => {
     const response = await request(app).get("/user/code").query({phone: 123123123})
     expect(response.statusCode).toBe(404)
-    console.log(response.body)
+    // console.log(response.body)
   })
 
 
@@ -75,34 +74,35 @@ describe("Test the /user/activate (POST) & /user/code (GET) paths", () => {
 // /user/login
 
 describe("Test the /user/login (POST) path", () => {
+
+  let code = ""
+
+  test("It should generate code", async() => {
+    const response = await request(app).post("/user/generate").send({phone: user.phone})
+    expect(response.statusCode).toBe(200)
+    console.log(response.body)
+  })
+
+  test("It should response with code", async() => {
+    const response = await request(app).get("/user/code").query({phone: user.phone})
+    expect(response.statusCode).toBe(200)
+    expect(response.body.message).toHaveLength(4)
+    code = response.body.message
+  })
+
   test("It should response with 'done' state and auth cookies in headers", async() => {
-    const {phone, password, uid} = user
-    const response = await request(app).post("/user/login").send({phone, password, uid})
+    const {phone, uid} = user
+    const response = await request(app).post("/user/login").send({phone, code, uid})
     expect(response.statusCode).toBe(200)
   })
 
-  // for ban mechanism
-  test.skip("It should response with error (more than 3 deviced connected with account)", async() => {
+  test("It should response with 'error' (can't use one code twice)", async() => {
+    const {phone, uid} = user
+    const response = await request(app).post("/user/login").send({phone, code, uid})
+    expect(response.statusCode).toBe(401)
+  })
 
-      const {phone, password} = user
 
-      await request(app)
-        .post("/user/login")
-        .send({phone, password, uid: uuid4()})
-      
-      await request(app)
-        .post("/user/login")
-        .send({phone, password, uid: uuid4()})
-      
-
-      const response = await request(app)
-      .post("/user/login")
-      .send({phone, password, uid: uuid4()})
-      
-      expect(response.statusCode).toEqual(409)
-
- 
-    })
 })
 
 

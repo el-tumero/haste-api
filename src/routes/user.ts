@@ -37,6 +37,13 @@ user.post("/activate", async(req, res) => {
     res.json(data)
 })
 
+user.post("/generate", async(req, res) => {
+    const phone = req.body.phone as string
+    const data = await controllers.tfa.generateCode(phone)
+    statusHandler(data.state, res)
+    res.json(data)
+})
+
 user.get("/code", async(req, res) => {
     const phone = req.query.phone
     const data = controllers.tfa.displayCode(phone)

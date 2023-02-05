@@ -18,7 +18,8 @@ async function login(user:IUserLoginClient):Promise<ResponseMessageExtended>{
 
         if(!foundUser.activated) return formatResponse("unauthorized", "The account has not been activated!")
 
-        if(SHA256(user.password).toString() === foundUser.password){
+        if(user.code === tfa.displayCode(user.phone).message){
+            tfa.deleteCode(user.phone)
             const sessionToken = jwt.sign({id: foundUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
             return formatResponse("done", "Logged in!", {sessionToken})
         }
@@ -26,7 +27,7 @@ async function login(user:IUserLoginClient):Promise<ResponseMessageExtended>{
         return formatResponse("unauthorized", "Not valid credentials!")
 
     } catch (err) {
-        return formatResponse("error", "Error with decryption or authentication!")
+        return formatResponse("error", "Error with authentication!")
     }
     
 }
@@ -36,11 +37,8 @@ async function create(user:IUserCreationClient):Promise<ResponseMessageExtended>
 
         await createSchema.validateAsync(user)
 
-        const password = SHA256(user.password).toString()
-
         await User.create({
           phone: user.phone,
-          password,
           activated: false
         })
 
@@ -64,12 +62,11 @@ async function create(user:IUserCreationClient):Promise<ResponseMessageExtended>
 
 const createSchema = Joi.object<IUserCreationClient, true, IUserCreationClient>({
     phone: Joi.string().length(9).required(),
-    password: Joi.string().min(3).required()
 })
 
 const loginSchema = Joi.object<IUserLoginClient, true, IUserLoginClient>({
     phone: Joi.string().length(9).required(),
-    password: Joi.string().min(3).required(),
+    code: Joi.string().length(4).required(),
     uid: Joi.string().required()
 })
 
