@@ -25,9 +25,11 @@
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.4",
+    "nodemon": "^2.0.20",
     "otplib": "^12.0.1",
     "qrcode": "^1.5.1",
     "supertest": "^6.2.4",
+    "ts-node": "^10.9.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

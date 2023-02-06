@@ -4,10 +4,25 @@ import { SHA256 } from 'crypto-js'
 import jwt from 'jsonwebtoken'
 import formatResponse from './formatResponse'
 import { ResponseMessageExtended } from "../types/ResponseMessage";
+import IUserBase from "../types/User/IUserBase";
 import IUserLoginClient from "../types/User/IUserLoginClient";
 import IUserCreationClient from "../types/User/IUserCreationClient";
 import tfa from "./tfa";
 
+async function userExists(user:IUserBase): Promise<ResponseMessageExtended>{
+    try {
+        
+        await checkSchema.validateAsync(user)
+
+        const found = await User.findOne( {phone: user.phone} )
+
+        if(!found) return formatResponse("done", "N")
+        return formatResponse("done", "Y")
+        
+    } catch (err) {
+        return formatResponse("error", "Error checking user")
+    }
+}
 
 async function login(user:IUserLoginClient):Promise<ResponseMessageExtended>{
     try {
@@ -20,7 +35,8 @@ async function login(user:IUserLoginClient):Promise<ResponseMessageExtended>{
 
         if(user.code === tfa.displayCode(user.phone).message){
             tfa.deleteCode(user.phone)
-            const sessionToken = jwt.sign({id: foundUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
+            const sessionToken = jwt.sign({id: foundUser.id}, "123", {expiresIn: '10h'})
+            // const sessionToken = jwt.sign({id: foundUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
             return formatResponse("done", "Logged in!", {sessionToken})
         }
 
@@ -60,6 +76,10 @@ async function create(user:IUserCreationClient):Promise<ResponseMessageExtended>
     }
 }
 
+const checkSchema = Joi.object<IUserBase, true, IUserBase>({
+    phone: Joi.string().length(9).required()   
+})
+
 const createSchema = Joi.object<IUserCreationClient, true, IUserCreationClient>({
     phone: Joi.string().length(9).required(),
 })
@@ -71,6 +91,7 @@ const loginSchema = Joi.object<IUserLoginClient, true, IUserLoginClient>({
 })
 
 export default {
+    userExists,
     create,
     login,
 }

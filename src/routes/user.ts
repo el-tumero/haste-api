@@ -6,7 +6,15 @@ import verification, { RequestWithId } from "../middlewares/verification";
 
 const user = Router()
 
-user.post("/login", async(req, res) => {
+user.post("signup", async(req, res) => {
+
+    const data = await controllers.user.create(req.body)
+    
+    statusHandler(data.state, res)
+    res.json(data)
+})
+
+user.post("/signin", async(req, res) => {
     const {sessionToken, ...data}= await controllers.user.login(req.body) 
     if(sessionToken) res.cookie("sessionToken", sessionToken, cookieSettings)
     
@@ -23,7 +31,8 @@ user.post("/logout", async(req, res) => {
 })
 
 user.post("/", async (req, res) => {
-    const data = await controllers.user.create(req.body)
+    
+    const data = await controllers.user.userExists(req.body)
     
     statusHandler(data.state, res)
     res.json(data)
