@@ -6,7 +6,7 @@ import verification, { RequestWithId } from "../middlewares/verification";
 
 const user = Router()
 
-user.post("signup", async(req, res) => {
+user.post("/signup", async(req, res) => {
 
     const data = await controllers.user.create(req.body)
     
@@ -30,8 +30,8 @@ user.post("/logout", async(req, res) => {
     res.json({state: "done", message: "Succesfully logged out!"})
 })
 
-user.post("/", async (req, res) => {
-    
+user.get("/", async (req, res) => {
+    const phone = req.query.phone
     const data = await controllers.user.userExists(req.body)
     
     statusHandler(data.state, res)
@@ -39,8 +39,8 @@ user.post("/", async (req, res) => {
 })
 
 user.post("/activate", async(req, res) => {
-    const code = req.body.code as string
     const phone = req.body.phone as string
+    const code = req.body.code as string
     const data = await controllers.tfa.activate(phone, code)
     statusHandler(data.state, res)
     res.json(data)

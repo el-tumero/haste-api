@@ -16,8 +16,8 @@ async function userExists(user:IUserBase): Promise<ResponseMessageExtended>{
 
         const found = await User.findOne( {phone: user.phone} )
 
-        if(!found) return formatResponse("done", "N")
-        return formatResponse("done", "Y")
+        if(!found) return formatResponse("done", "User doesn't exist")
+        return formatResponse("done", "User exists")
         
     } catch (err) {
         return formatResponse("error", "Error checking user")
@@ -35,7 +35,8 @@ async function login(user:IUserLoginClient):Promise<ResponseMessageExtended>{
 
         if(user.code === tfa.displayCode(user.phone).message){
             tfa.deleteCode(user.phone)
-            const sessionToken = jwt.sign({id: foundUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
+            // const sessionToken = jwt.sign({id: foundUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
+            const sessionToken = jwt.sign({id: foundUser.id}, "process.env.PRIVATE_KE12Y", {expiresIn: '10h'})
             return formatResponse("done", "Logged in!", {sessionToken})
         }
 
