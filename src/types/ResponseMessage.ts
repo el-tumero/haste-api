@@ -1,5 +1,4 @@
 import ProfileBase from "./Profile/IProfileBase"
-import ProfileCreation from "./Profile/IProfileCreation"
 
 export type ResponseState = "done" | "error" | "notfound" | "unauthorized" | "conflict"
 

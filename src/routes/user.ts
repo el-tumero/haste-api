@@ -2,7 +2,7 @@ import { Router } from "express";
 import controllers from "../controllers/controllers";
 import statusHandler from "./utils/statusHandler";
 import cookieSettings from "./utils/cookieSettings";
-import verification, { RequestWithId } from "../middlewares/verification";
+
 
 const user = Router()
 
@@ -32,8 +32,8 @@ user.post("/logout", async(req, res) => {
 
 user.get("/", async (req, res) => {
     const phone = req.query.phone
-    const data = await controllers.user.userExists(req.body)
-    
+    const data = await controllers.user.userExists(phone)
+
     statusHandler(data.state, res)
     res.json(data)
 })

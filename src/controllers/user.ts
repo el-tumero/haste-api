@@ -9,14 +9,13 @@ import IUserLoginClient from "../types/User/IUserLoginClient";
 import IUserCreationClient from "../types/User/IUserCreationClient";
 import tfa from "./tfa";
 
-async function userExists(user:IUserBase): Promise<ResponseMessageExtended>{
+async function userExists(phone:any): Promise<ResponseMessageExtended>{
     try {
-        
-        await checkSchema.validateAsync(user)
 
-        const found = await User.findOne( {phone: user.phone} )
+        if(typeof phone !== "string" || phone.length != 9) throw Error()
+        const found = await User.findOne({phone})
 
-        if(!found) return formatResponse("done", "User doesn't exist")
+        if(!found) return formatResponse("notfound", "User doesn't exist")
         return formatResponse("done", "User exists")
         
     } catch (err) {
@@ -75,9 +74,7 @@ async function create(user:IUserCreationClient):Promise<ResponseMessageExtended>
     }
 }
 
-const checkSchema = Joi.object<IUserBase, true, IUserBase>({
-    phone: Joi.string().length(9).required()   
-})
+
 
 const createSchema = Joi.object<IUserCreationClient, true, IUserCreationClient>({
     phone: Joi.string().length(9).required(),

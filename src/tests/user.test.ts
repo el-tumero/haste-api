@@ -63,7 +63,6 @@ describe("Test the /user/activate (POST) & /user/code (GET) paths", () => {
 
   test("It should activate account", async() => {
     const response = await request(app).post("/user/activate").send({phone:user.phone, code})
-    console.log(response.body)
     expect(response.statusCode).toBe(200)
   })
 
@@ -102,6 +101,25 @@ describe("Test the /user/signin (POST) path", () => {
   })
 
 
+})
+
+describe("Test the /user?phone= (GET) path", () => {
+  test("It should response with 200 (user exists)", async() => {
+    const {phone} = user
+    const response = await request(app).get("/user").query({phone})
+    expect(response.statusCode).toBe(200)
+  })
+
+  test("It should response with 404 (user does not exist)", async() => {
+    const {phone} = user
+    const response = await request(app).get("/user").query({phone: "133445114"})
+    expect(response.statusCode).toBe(404)
+  })
+
+  test("It should response with 400 (wrong data passed)", async() => {
+    const response = await request(app).get("/user").query({phone: 144})
+    expect(response.statusCode).toBe(400)
+  })
 })
 
 
