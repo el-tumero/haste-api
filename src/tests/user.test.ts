@@ -12,8 +12,7 @@ const user = {
 
 beforeAll(async() => {
   try {
-    // await mongoose.connect(process.env.MONGO_URI as string)
-    await mongoose.connect("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.6.2process.env.MONGO_URI" as string)
+    await mongoose.connect(process.env.MONGO_URI as string)
   } catch (error) {
     console.log(error)
   }
@@ -53,7 +52,6 @@ describe("Test the /user/activate (POST) & /user/code (GET) paths", () => {
     expect(response.body.message).toHaveLength(4)
     // console.log(response.body.message)
     code = response.body.message
-    console.log(code)
   })
 
   test("It should response with error", async() => {
@@ -82,7 +80,6 @@ describe("Test the /user/signin (POST) path", () => {
   test("It should generate code", async() => {
     const response = await request(app).post("/user/generate").send({phone: user.phone})
     expect(response.statusCode).toBe(200)
-    // console.log(response.body)
   })
 
   test("It should response with code", async() => {

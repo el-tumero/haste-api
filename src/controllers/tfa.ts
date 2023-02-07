@@ -36,7 +36,7 @@ async function activate(phone:string, code:string){
         // return formatResponse("done", "Account activated!")
 
     } catch (error) {
-        return formatResponse("error", "Server error")
+        return formatResponse("error", `Server error \n ${error}`)
     }
 }
 

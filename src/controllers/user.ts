@@ -35,8 +35,7 @@ async function login(user:IUserLoginClient):Promise<ResponseMessageExtended>{
 
         if(user.code === tfa.displayCode(user.phone).message){
             tfa.deleteCode(user.phone)
-            // const sessionToken = jwt.sign({id: foundUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
-            const sessionToken = jwt.sign({id: foundUser.id}, "process.env.PRIVATE_KE12Y", {expiresIn: '10h'})
+            const sessionToken = jwt.sign({id: foundUser.id}, process.env.PRIVATE_KEY, {expiresIn: '10h'})
             return formatResponse("done", "Logged in!", {sessionToken})
         }
 
